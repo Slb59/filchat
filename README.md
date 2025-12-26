@@ -11,12 +11,18 @@ activer l'environnement python :
 source .venv/bin/activate
 ```
 
+## Mode ligne de commande
 execution du script avec génération d'un fichier zip:
 ```bash
 python filchat.py input O
 ```
 
 option possible : --force -> vide automatiquement le dossier output
+
+## Mode interface
+```bash
+python filchat.py
+```
 
 # git commandes
 
@@ -31,6 +37,9 @@ uv add <nom de la librairie>
 ## pour extraire le code
 uv add gitingest
 gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
+
+# creation de l'executable
+pyinstaller --onefile --windowed filchat.py
 
 # Evolutions possibles
 

@@ -2,7 +2,114 @@ import os
 import sys
 import zipfile
 import shutil
+import tkinter as tk
+import threading
+import queue
+import logging
 from datetime import datetime
+from tkinter import filedialog, messagebox, scrolledtext
+
+logger = logging.getLogger("filchat")
+logger.setLevel(logging.INFO)
+
+
+class TkLogHandler(logging.Handler):
+    def __init__(self, log_func):
+        super().__init__()
+        self.log_func = log_func
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.log_func(msg)
+
+
+def lancer_interface():
+    log_queue = queue.Queue()
+
+    root = tk.Tk()
+    root.title("FilChat – Découpe de conversations")
+    root.geometry("600x400")
+
+    dossier_input = tk.StringVar()
+    option_archive = tk.BooleanVar()
+    option_force = tk.BooleanVar()
+
+    def poll_log_queue():
+        try:
+            while True:
+                message = log_queue.get_nowait()
+                console.insert(tk.END, message + "\n")
+                console.see(tk.END)
+        except queue.Empty:
+            pass
+
+        root.after(100, poll_log_queue)
+
+
+    def choisir_dossier():
+        path = filedialog.askdirectory()
+        if path:
+            dossier_input.set(path)
+
+    def log(message):
+        log_queue.put(message)
+
+    def lancer_traitement():
+        path = dossier_input.get()
+
+        if not path:
+            messagebox.showerror("Erreur", "Veuillez sélectionner un dossier d'entrée")
+            return
+
+        def worker():
+
+            try:
+
+                log("Traitement démarré…")
+
+                traiter_dossier(
+                    path,
+                    generer_archive=option_archive.get(),
+                    force=option_force.get()
+                )
+
+                log("Traitement terminé avec succès.")
+                messagebox.showinfo("Succès", "Traitement terminé")
+
+            except Exception as e:
+                messagebox.showerror("Erreur", str(e))
+                log(f"Erreur : {e}")
+
+
+        
+        threading.Thread(target=worker, daemon=True).start()
+
+    # ---- UI ----
+
+    frame = tk.Frame(root, padx=10, pady=10)
+    frame.pack(fill=tk.BOTH, expand=True)
+
+    tk.Label(frame, text="Dossier d'entrée").pack(anchor="w")
+    tk.Entry(frame, textvariable=dossier_input).pack(fill=tk.X)
+    tk.Button(frame, text="Parcourir…", command=choisir_dossier).pack(pady=5)
+
+    tk.Checkbutton(frame, text="Générer une archive ZIP", variable=option_archive).pack(anchor="w")
+    tk.Checkbutton(frame, text="Vider le dossier output (--force)", variable=option_force).pack(anchor="w")
+
+    tk.Button(frame, text="Lancer le traitement", command=lancer_traitement).pack(pady=10)
+
+    tk_handler = TkLogHandler(log)
+    tk_handler.setFormatter(logging.Formatter("%(message)s"))
+
+    logger.addHandler(tk_handler)
+
+    console = scrolledtext.ScrolledText(frame, height=10)
+    console.pack(fill=tk.BOTH, expand=True)
+
+    poll_log_queue()
+
+    root.mainloop()
+
 
 def verifier_ou_vider_output(dossier_output, force = False):
     if not os.path.exists(dossier_output):
@@ -11,11 +118,13 @@ def verifier_ou_vider_output(dossier_output, force = False):
     if os.listdir(dossier_output):
         if force:
             shutil.rmtree(dossier_output)
-            print(f"Dossier '{dossier_output}' vidé (--force)")
+            # print(f"Dossier '{dossier_output}' vidé (--force)")
         else:
-            print(f"Erreur : le dossier '{dossier_output}' n'est pas vide.")
-            print("Utilisez --force pour vider le dossier automatiquement.")
-            sys.exit(1)
+            raise RuntimeError(
+                f"Le dossier '{dossier_output}' n'est pas vide.\n"
+                f"Utilisez --force pour vider le dossier automatiquement."
+            )
+
 
 
 def creer_archive_output(dossier_output):
@@ -90,47 +199,67 @@ date: {datetime.now().strftime("%Y-%m-%d")}
         with open(chemin, "w", encoding="utf-8") as out:
             out.write(contenu)
 
-    print(f"{len(questions)} fichiers Markdown générés dans : {dossier_sortie}")
+    logger.info(f"{len(questions)} fichiers Markdown générés dans : {dossier_sortie}")
 
 def normalize_name(filename):
     """Transforme 'goudron bitimeux.txt' → 'goudron_bitimeux'"""
     name = os.path.splitext(filename)[0]
     return name.strip().lower().replace(" ", "_")
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage : python3 filchat.py dossier_input [O/N]")
-        sys.exit(1)
-    
-    dossier_input = sys.argv[1]
-    generer_archive = False
-    force = False
 
-    # Analyse des paramètres
-    for arg in sys.argv[2:]:
-        if arg.upper() == "O":
-            generer_archive = True
-        elif arg.upper() == "N":
-            generer_archive = False
-        elif arg == "--force":
-            force = True
-
+def traiter_dossier(dossier_input, generer_archive=False, force=False):
     if not os.path.isdir(dossier_input):
-        print(f"Erreur : {dossier_input} n'est pas un dossier")
-        sys.exit(1)
+        raise ValueError("Le dossier d'entrée est invalide")
 
     dossier_output = "output"
+
     verifier_ou_vider_output(dossier_output, force=force)
     os.makedirs(dossier_output, exist_ok=True)
 
     for fichier in os.listdir(dossier_input):
         if not fichier.lower().endswith(".txt"):
             continue
-    
+
         chemin_fichier = os.path.join(dossier_input, fichier)
         nom_dossier = normalize_name(fichier)
         chemin_sortie = os.path.join(dossier_output, nom_dossier)
+
         decoupe_chat(chemin_fichier, chemin_sortie)
 
     if generer_archive:
         creer_archive_output(dossier_output)
+
+
+if __name__ == "__main__":
+
+    if len(sys.argv) > 1:  # Mode ligne de commande
+
+        dossier_input = sys.argv[1]
+        generer_archive = False
+        force = False
+
+        # Analyse des paramètres
+        for arg in sys.argv[2:]:
+            if arg.upper() == "O":
+                generer_archive = True
+            elif arg.upper() == "N":
+                generer_archive = False
+            elif arg == "--force":
+                force = True
+
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_formatter = logging.Formatter("%(message)s")
+        console_handler.setFormatter(console_formatter)
+
+        logger.addHandler(console_handler)
+
+        
+        traiter_dossier(dossier_input, generer_archive, force)
+
+    else:  # Mode interface
+
+        lancer_interface()
+
+
+
+
