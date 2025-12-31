@@ -39,11 +39,10 @@ uv add gitingest
 gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 
 # creation de l'executable
-pyinstaller --onefile --windowed filchat.py
+pyinstaller --onefile filchat.py
 
 # Evolutions possibles
 
-- proposer une interface
 - generer un programme executable
 
 # Problèmes à résoudre
@@ -53,5 +52,6 @@ Les tableaux ne sont pas correctement formatés.
 # Versions
 
 20251224: generer un fichier zip correspondant à l'execution avec date et heure
+20251226: ajout d'une interface graphique
 
 - 0.0.1 : première version

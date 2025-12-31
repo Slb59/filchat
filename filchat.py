@@ -2,16 +2,128 @@ import os
 import sys
 import zipfile
 import shutil
-import tkinter as tk
-import threading
-import queue
 import logging
 from datetime import datetime
-from tkinter import filedialog, messagebox, scrolledtext
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QLineEdit, QCheckBox, QLabel, QTextEdit, QFileDialog, QMessageBox
+)
+from PySide6.QtCore import QThread, Signal, Slot, QObject
 
+# Configuration du logger
 logger = logging.getLogger("filchat")
 logger.setLevel(logging.INFO)
 
+class Worker(QObject):
+    finished = Signal()
+    log_signal = Signal(str)
+    error_signal = Signal(str)
+
+    def __init__(self, path, generer_archive, force):
+        super().__init__()
+        self.path = path
+        self.generer_archive = generer_archive
+        self.force = force
+
+    def run(self):
+        try:
+            self.log_signal.emit("Traitement démarré…")
+            traiter_dossier(self.path, self.generer_archive, self.force)
+            self.log_signal.emit("Traitement terminé avec succès.")
+            self.finished.emit()
+        except Exception as e:
+            self.error_signal.emit(str(e))
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("FilChat – Découpe de conversations")
+        self.setGeometry(100, 100, 600, 400)
+
+        # Variables
+        self.dossier_input = ""
+        self.option_archive = False
+        self.option_force = False
+
+        # Widgets
+        self.init_ui()
+
+    def init_ui(self):
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
+
+        # Dossier d'entrée
+        input_layout = QHBoxLayout()
+        self.label_path = QLabel("Dossier d'entrée :")
+        self.line_edit_path = QLineEdit()
+        self.button_browse = QPushButton("Parcourir…")
+        self.button_browse.clicked.connect(self.choisir_dossier)
+        input_layout.addWidget(self.label_path)
+        input_layout.addWidget(self.line_edit_path)
+        input_layout.addWidget(self.button_browse)
+        layout.addLayout(input_layout)
+
+        # Options
+        self.check_archive = QCheckBox("Générer une archive ZIP")
+        self.check_force = QCheckBox("Vider le dossier output (--force)")
+        layout.addWidget(self.check_archive)
+        layout.addWidget(self.check_force)
+
+        # Bouton de traitement
+        self.button_run = QPushButton("Lancer le traitement")
+        self.button_run.clicked.connect(self.lancer_traitement)
+        layout.addWidget(self.button_run)
+
+        # Console de logs
+        self.console = QTextEdit()
+        self.console.setReadOnly(True)
+        layout.addWidget(self.console)
+
+        # Configuration du logger
+        self.tk_handler = TkLogHandler(self.log)
+        self.tk_handler.setFormatter(logging.Formatter("%(message)s"))
+        logger.addHandler(self.tk_handler)
+
+    def choisir_dossier(self):
+        path = QFileDialog.getExistingDirectory(self, "Sélectionner un dossier")
+        if path:
+            self.dossier_input = path
+            self.line_edit_path.setText(path)
+
+    def log(self, message):
+        self.console.append(message)
+
+    def lancer_traitement(self):
+        path = self.line_edit_path.text()
+        if not path:
+            QMessageBox.critical(self, "Erreur", "Veuillez sélectionner un dossier d'entrée")
+            return
+
+        self.worker_thread = QThread()
+        self.worker = Worker(
+            path,
+            self.check_archive.isChecked(),
+            self.check_force.isChecked()
+        )
+        self.worker.moveToThread(self.worker_thread)
+
+        # Connexions des signaux
+        self.worker.log_signal.connect(self.log)
+        self.worker.error_signal.connect(self.show_error)
+        self.worker.finished.connect(self.worker_thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater) 
+        self.worker_thread.finished.connect(self.worker_thread.deleteLater)
+        # self.worker.finished.connect(self.show_success)
+
+        self.worker_thread.started.connect(self.worker.run)
+        self.worker_thread.start()
+
+    def show_error(self, message):
+        QMessageBox.critical(self, "Erreur", message)
+
+    def show_success(self):
+        QMessageBox.information(self, "Succès", "Traitement terminé")
 
 class TkLogHandler(logging.Handler):
     def __init__(self, log_func):
@@ -21,95 +133,6 @@ class TkLogHandler(logging.Handler):
     def emit(self, record):
         msg = self.format(record)
         self.log_func(msg)
-
-
-def lancer_interface():
-    log_queue = queue.Queue()
-
-    root = tk.Tk()
-    root.title("FilChat – Découpe de conversations")
-    root.geometry("600x400")
-
-    dossier_input = tk.StringVar()
-    option_archive = tk.BooleanVar()
-    option_force = tk.BooleanVar()
-
-    def poll_log_queue():
-        try:
-            while True:
-                message = log_queue.get_nowait()
-                console.insert(tk.END, message + "\n")
-                console.see(tk.END)
-        except queue.Empty:
-            pass
-
-        root.after(100, poll_log_queue)
-
-
-    def choisir_dossier():
-        path = filedialog.askdirectory()
-        if path:
-            dossier_input.set(path)
-
-    def log(message):
-        log_queue.put(message)
-
-    def lancer_traitement():
-        path = dossier_input.get()
-
-        if not path:
-            messagebox.showerror("Erreur", "Veuillez sélectionner un dossier d'entrée")
-            return
-
-        def worker():
-
-            try:
-
-                log("Traitement démarré…")
-
-                traiter_dossier(
-                    path,
-                    generer_archive=option_archive.get(),
-                    force=option_force.get()
-                )
-
-                log("Traitement terminé avec succès.")
-                messagebox.showinfo("Succès", "Traitement terminé")
-
-            except Exception as e:
-                messagebox.showerror("Erreur", str(e))
-                log(f"Erreur : {e}")
-
-
-        
-        threading.Thread(target=worker, daemon=True).start()
-
-    # ---- UI ----
-
-    frame = tk.Frame(root, padx=10, pady=10)
-    frame.pack(fill=tk.BOTH, expand=True)
-
-    tk.Label(frame, text="Dossier d'entrée").pack(anchor="w")
-    tk.Entry(frame, textvariable=dossier_input).pack(fill=tk.X)
-    tk.Button(frame, text="Parcourir…", command=choisir_dossier).pack(pady=5)
-
-    tk.Checkbutton(frame, text="Générer une archive ZIP", variable=option_archive).pack(anchor="w")
-    tk.Checkbutton(frame, text="Vider le dossier output (--force)", variable=option_force).pack(anchor="w")
-
-    tk.Button(frame, text="Lancer le traitement", command=lancer_traitement).pack(pady=10)
-
-    tk_handler = TkLogHandler(log)
-    tk_handler.setFormatter(logging.Formatter("%(message)s"))
-
-    logger.addHandler(tk_handler)
-
-    console = scrolledtext.ScrolledText(frame, height=10)
-    console.pack(fill=tk.BOTH, expand=True)
-
-    poll_log_queue()
-
-    root.mainloop()
-
 
 def verifier_ou_vider_output(dossier_output, force = False):
     if not os.path.exists(dossier_output):
@@ -229,37 +252,8 @@ def traiter_dossier(dossier_input, generer_archive=False, force=False):
     if generer_archive:
         creer_archive_output(dossier_output)
 
-
 if __name__ == "__main__":
-
-    if len(sys.argv) > 1:  # Mode ligne de commande
-
-        dossier_input = sys.argv[1]
-        generer_archive = False
-        force = False
-
-        # Analyse des paramètres
-        for arg in sys.argv[2:]:
-            if arg.upper() == "O":
-                generer_archive = True
-            elif arg.upper() == "N":
-                generer_archive = False
-            elif arg == "--force":
-                force = True
-
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_formatter = logging.Formatter("%(message)s")
-        console_handler.setFormatter(console_formatter)
-
-        logger.addHandler(console_handler)
-
-        
-        traiter_dossier(dossier_input, generer_archive, force)
-
-    else:  # Mode interface
-
-        lancer_interface()
-
-
-
-
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
