@@ -13,3 +13,9 @@ wheels/
 input/
 output/
 *.zip
+
+# Fichiers de production
+dist-prod/
+*.tar.gz
+build/
+dist/

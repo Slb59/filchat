@@ -51,7 +51,11 @@ Les tableaux ne sont pas correctement formatés.
 
 # Versions
 
+
+
+- 0.0.2 : première version fonctionnelle
 20251224: generer un fichier zip correspondant à l'execution avec date et heure
 20251226: ajout d'une interface graphique
+20251231: modification du choix de l'interface graphique de tkinter à PySide6
 
 - 0.0.1 : première version
