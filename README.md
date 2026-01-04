@@ -39,7 +39,9 @@ uv add gitingest
 gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 
 # creation de l'executable
-pyinstaller --onefile filchat.py
+./build.sh
+On obtient une archive .tar.gz contenant l'exécutable
+On obtient aussi un dossier dist-prod contenant le code compilé
 
 # Evolutions possibles
 

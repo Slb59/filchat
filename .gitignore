@@ -19,3 +19,6 @@ dist-prod/
 *.tar.gz
 build/
 dist/
+
+# Fichiers de débogage
+filchat_debug.log
