@@ -70,6 +70,7 @@ echo "📦 Exécutable disponible : $DEST_DIR/$APP_NAME"
 
 # Créer une archive pour Dropbox
 ARCHIVE_NAME="${APP_NAME}_${VERSION}_linux.tar.gz"
-tar -czf "$ARCHIVE_NAME" -C "$DEST_DIR" ./versions
+tar -czf "./versions/$ARCHIVE_NAME" -C "$DEST_DIR" .  # le . est obligatoire pour inclure le dossier
+# cp "$ARCHIVE_NAME" "./versions/"
 echo "📦 Archive créée : $ARCHIVE_NAME"
 echo "💡 Vous pouvez maintenant copier cette archive dans Dropbox"

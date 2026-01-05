@@ -87,12 +87,22 @@ class MainWindow(QMainWindow):
         input_layout = QHBoxLayout()
         self.label_path = QLabel("Dossier d'entrée :")
         self.line_edit_path = QLineEdit()
+        self.line_edit_path.setPlaceholderText("Saisissez le chemin ou utilisez Parcourir...")
         self.button_browse = QPushButton("Parcourir…")
         self.button_browse.clicked.connect(self.choisir_dossier)
         input_layout.addWidget(self.label_path)
         input_layout.addWidget(self.line_edit_path)
         input_layout.addWidget(self.button_browse)
         layout.addLayout(input_layout)
+
+        # Bouton pour définir le répertoire courant comme input
+        current_dir_layout = QHBoxLayout()
+        self.button_use_current = QPushButton("Utiliser le répertoire courant")
+        self.button_use_current.clicked.connect(self.utiliser_repertoire_courant)
+        self.button_use_current.setStyleSheet("color: gray;")
+        current_dir_layout.addStretch()
+        current_dir_layout.addWidget(self.button_use_current)
+        layout.addLayout(current_dir_layout)
 
         # Options
         self.check_archive = QCheckBox("Générer une archive ZIP")
@@ -118,6 +128,18 @@ class MainWindow(QMainWindow):
         # Note: On ne connecte PAS le logger à la console pour éviter les problèmes de threading
         # Les messages importants passent par les signaux log_signal du Worker
 
+    def utiliser_repertoire_courant(self):
+        """Définit le répertoire de travail actuel comme dossier d'entrée"""
+        try:
+            current = os.getcwd()
+            logger.info(f"Utilisation du répertoire courant: {current}")
+            self.dossier_input = join(current, "input")
+            self.line_edit_path.setText(current)
+            self.console.append(f"📁 Répertoire courant défini : {current}")
+        except Exception as e:
+            logger.error(f"Erreur dans utiliser_repertoire_courant: {str(e)}")
+    
+    
     def choisir_dossier(self):
         try:
             logger.info("Ouverture du dialog de sélection de dossier")
@@ -129,21 +151,32 @@ class MainWindow(QMainWindow):
             # Options pour éviter les crashes sur certains systèmes
             options = QFileDialog.Option.DontUseNativeDialog
 
-            path = QFileDialog.getExistingDirectory(
-                self,
-                "Sélectionner un dossier",
-                start_dir,
-                options
-            )
-
-            logger.info(f"Dossier sélectionné: {path}")
-
-            if path:
-                self.dossier_input = path
-                self.line_edit_path.setText(path)
-                self.log(f"Dossier sélectionné : {path}")
+            logger.debug("Création du QFileDialog")
+            
+            # Méthode défensive : créer explicitement le dialogue
+            dialog = QFileDialog(self)
+            dialog.setFileMode(QFileDialog.FileMode.Directory)
+            dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+            dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
+            dialog.setDirectory(start_dir)
+            dialog.setWindowTitle("Sélectionner un dossier")
+            
+            logger.debug("Affichage du dialogue")
+            
+            # Exécuter le dialogue
+            if dialog.exec() == QFileDialog.DialogCode.Accepted:
+                selected = dialog.selectedFiles()
+                if selected:
+                    path = selected[0]
+                    logger.info(f"Dossier sélectionné: {path}")
+                    self.dossier_input = path
+                    self.line_edit_path.setText(path)
+                    self.console.append(f"Dossier sélectionné : {path}")
+                else:
+                    logger.info("Aucun dossier sélectionné")
             else:
                 logger.info("Sélection annulée par l'utilisateur")
+            logger.debug("Dialogue fermé proprement")
                 
         except Exception as e:
             logger.error(f"Erreur dans choisir_dossier: {str(e)}")
@@ -153,7 +186,7 @@ class MainWindow(QMainWindow):
                 "Erreur",
                 f"Impossible d'ouvrir le sélecteur de fichiers.\n\n"
                 f"Erreur: {str(e)}\n\n"
-                f"Vous pouvez saisir le chemin manuellement."
+                f"Vous pouvez saisir le chemin manuellement dans le champ texte."
             )
 
     def log(self, message):
