@@ -5,7 +5,7 @@
 
 set -e
 
-APP_NAME="FilChat"
+APP_NAME="filchat"
 VERSION=$(date +%Y.%m.%d)
 
 echo "🔨 Compilation de $APP_NAME"
@@ -17,8 +17,21 @@ if ! command -v pyinstaller &> /dev/null; then
     exit 1
 fi
 
+# Vérifier que Docker est installé (si on veut construire le conteneur)
+BUILD_DOCKER=false
+if command -v docker &> /dev/null; then
+    read -p "🐳 Voulez-vous construire une image Docker pour FilChat ? (o/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[OoYy]$ ]]; then
+        BUILD_DOCKER=true
+    fi
+fi
+
 # Créer les dossiers de destination
 DEST_DIR="./dist-prod"
+VERSIONS_DIR="./versions"
+mkdir -p "$DEST_DIR"
+mkdir -p "$VERSIONS_DIR"
 echo "📁 Dossier de destination : $DEST_DIR"
 
 # Nettoyer les anciens builds
@@ -33,8 +46,6 @@ pyinstaller --onefile \
     --clean \
     filchat.py
 
-# Créer le dossier de destination
-mkdir -p "$DEST_DIR"
 
 # Copier l'exécutable
 cp dist/$APP_NAME "$DEST_DIR/"
@@ -74,3 +85,49 @@ tar -czf "./versions/$ARCHIVE_NAME" -C "$DEST_DIR" .  # le . est obligatoire pou
 # cp "$ARCHIVE_NAME" "./versions/"
 echo "📦 Archive créée : $ARCHIVE_NAME"
 echo "💡 Vous pouvez maintenant copier cette archive dans Dropbox"
+
+# --- Construction du conteneur Docker ---
+if [ "$BUILD_DOCKER" = true ]; then
+    echo "🐳 Construction de l'image Docker pour $APP_NAME..."
+
+    # Créer un Dockerfile
+    cat > Dockerfile << 'EOF'
+FROM ubuntu:22.04
+
+# Installer les dépendances système
+RUN apt update && apt install -y \
+    python3 \
+    python3-pip \
+    libxcb-xinerama0 \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-render-util0 \
+    libxcb-randr0 \
+    libxcb-shape0 \
+    libxcb-xfixes0 \
+    libxcb-xkb1 \
+    libxkbcommon-x11-0 \
+    xvfb
+
+# Installer PySide6
+RUN pip install PySide6
+
+# Copier l'exécutable et les fichiers nécessaires
+COPY dist-prod/filchat /filchat
+COPY dist-prod/README.txt /README.txt
+
+# Lancer l'application avec Xvfb (pour éviter les problèmes d'affichage)
+CMD ["sh", "-c", "Xvfb :1 -screen 0 1024x768x16 & export DISPLAY=:1 && /filchat"]
+EOF
+
+    # Construire l'image Docker
+    docker buildx build --load -t "filchat:latest" .
+
+    # Nettoyer le Dockerfile
+    rm Dockerfile
+
+    echo "✅ Image Docker construite : $APP_NAME:latest"
+    echo "💡 Pour lancer le conteneur, utilisez :"
+    echo "    docker run -it --rm -e DISPLAY=$DISPLAY -e QT_QPA_PLATFORM=xcb -v /tmp/.X11-unix:/tmp/.X11-unix filchat:latest"
+fi

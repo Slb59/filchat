@@ -37,7 +37,10 @@ class Worker(QObject):
         try:
             logger.info(f"Worker démarré - path={self.path}, archive={self.generer_archive}, force={self.force}")
             self.log_signal.emit("Traitement démarré…")
-            traiter_dossier(self.path, self.generer_archive, self.force)
+            
+            # Passer self en paramètre pour que traiter_dossier puisse émettre des logs
+            traiter_dossier(self.path, self.generer_archive, self.force, self.log_signal)
+            
             self.log_signal.emit("Traitement terminé avec succès.")
             logger.info("Worker terminé avec succès")
         except RuntimeError as e:
@@ -467,7 +470,7 @@ def normalize_name(filename):
     return name.strip().lower().replace(" ", "_")
 
 
-def traiter_dossier(dossier_input, generer_archive=False, force=False):
+def traiter_dossier(dossier_input, generer_archive=False, force=False, log_signal=None):
     """Traite tous les fichiers .txt d'un dossier"""
     if not os.path.isdir(dossier_input):
         raise ValueError("Le dossier d'entrée est invalide")
@@ -487,14 +490,29 @@ def traiter_dossier(dossier_input, generer_archive=False, force=False):
         nom_dossier = normalize_name(fichier)
         chemin_sortie = os.path.join(dossier_output, nom_dossier)
         
+        # Logger dans le fichier
         logger.info(f"Traitement de {fichier}...")
+        
+        # Afficher dans la console de l'interface si log_signal est disponible
+        if log_signal:
+            log_signal.emit(f"📄 Traitement de {fichier}...")
+        
         decoupe_chat(chemin_fichier, chemin_sortie)
         fichiers_traites += 1
 
+    # Logger dans le fichier
     logger.info(f"{fichiers_traites} fichier(s) traité(s)")
+    
+    # Afficher dans la console de l'interface
+    if log_signal:
+        log_signal.emit(f"✅ {fichiers_traites} fichier(s) traité(s)")
 
     if generer_archive:
+        if log_signal:
+            log_signal.emit("📦 Génération de l'archive ZIP...")
         creer_archive_output(dossier_output)
+        if log_signal:
+            log_signal.emit("✅ Archive créée avec succès")
 
 
 def main():

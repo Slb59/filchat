@@ -11,6 +11,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QThread, Signal, QObject, Qt
 
+# Force l'utilisation de X11
+os.environ['QT_QPA_PLATFORM'] = 'xcb' 
+
 # Configuration du logger
 logger = logging.getLogger("filchat")
 logger.setLevel(logging.DEBUG)
@@ -37,7 +40,7 @@ class Worker(QObject):
         try:
             logger.info(f"Worker démarré - path={self.path}, archive={self.generer_archive}, force={self.force}")
             self.log_signal.emit("Traitement démarré…")
-            traiter_dossier(self.path, self.generer_archive, self.force)
+            traiter_dossier(self.path, self.generer_archive, self.force, self.log_signal)
             self.log_signal.emit("Traitement terminé avec succès.")
             logger.info("Worker terminé avec succès")
         except RuntimeError as e:
@@ -99,7 +102,7 @@ class MainWindow(QMainWindow):
         current_dir_layout = QHBoxLayout()
         self.button_use_current = QPushButton("Utiliser le répertoire courant")
         self.button_use_current.clicked.connect(self.utiliser_repertoire_courant)
-        self.button_use_current.setStyleSheet("color: gray;")
+        # self.button_use_current.setStyleSheet("color: gray;")
         current_dir_layout.addStretch()
         current_dir_layout.addWidget(self.button_use_current)
         layout.addLayout(current_dir_layout)
@@ -133,9 +136,9 @@ class MainWindow(QMainWindow):
         try:
             current = os.getcwd()
             logger.info(f"Utilisation du répertoire courant: {current}")
-            self.dossier_input = join(current, "input")
-            self.line_edit_path.setText(current)
-            self.console.append(f"📁 Répertoire courant défini : {current}")
+            self.dossier_input = os.path.join(current, "input")
+            self.line_edit_path.setText(self.dossier_input)
+            self.console.append(f"Répertoire courant défini : {self.dossier_input}")
         except Exception as e:
             logger.error(f"Erreur dans utiliser_repertoire_courant: {str(e)}")
     
@@ -149,34 +152,56 @@ class MainWindow(QMainWindow):
             logger.debug(f"Répertoire de départ: {start_dir}")
             
             # Options pour éviter les crashes sur certains systèmes
-            options = QFileDialog.Option.DontUseNativeDialog
+            options = QFileDialog.Options()
+            options |= QFileDialog.DontUseNativeDialog
+            options |= QFileDialog.ShowDirsOnly
 
             logger.debug("Création du QFileDialog")
             
             # Méthode défensive : créer explicitement le dialogue
-            dialog = QFileDialog(self)
-            dialog.setFileMode(QFileDialog.FileMode.Directory)
-            dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
-            dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
-            dialog.setDirectory(start_dir)
-            dialog.setWindowTitle("Sélectionner un dossier")
+            # dialog = QFileDialog(self)
+            # logger.debug("setFileMode")
+            # dialog.setFileMode(QFileDialog.FileMode.Directory)
+            # logger.debug("setOption- dontusenativedialog")
+            # dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+            # logger.debug("setOption- showdirsonly")
+            # dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
+            # logger.debug(f"setDirectory - {start_dir}")
+            start_dir = os.path.normpath(os.path.abspath(start_dir))
+            # dialog.setDirectory(start_dir)
+            # dialog.setWindowTitle("Sélectionner un dossier")
+            path_selected = QFileDialog.getExistingDirectory(
+                self, 
+                "Sélectionner un dossier", 
+                start_dir, 
+                options=options
+            )
             
             logger.debug("Affichage du dialogue")
             
             # Exécuter le dialogue
-            if dialog.exec() == QFileDialog.DialogCode.Accepted:
-                selected = dialog.selectedFiles()
-                if selected:
-                    path = selected[0]
-                    logger.info(f"Dossier sélectionné: {path}")
-                    self.dossier_input = path
-                    self.line_edit_path.setText(path)
-                    self.console.append(f"Dossier sélectionné : {path}")
-                else:
-                    logger.info("Aucun dossier sélectionné")
+            # if dialog.exec() == QFileDialog.DialogCode.Accepted:
+            #     selected = dialog.selectedFiles()
+            #     if selected:
+            #         path = selected[0]
+            #         logger.info(f"Dossier sélectionné: {path}")
+            #         self.dossier_input = path
+            #         self.line_edit_path.setText(path)
+            #         self.console.append(f"Dossier sélectionné : {path}")
+            #     else:
+            #         logger.info("Aucun dossier sélectionné")
+            # else:
+            #     logger.info("Sélection annulée par l'utilisateur")
+            # logger.debug("Dialogue fermé proprement")
+
+            if path_selected:
+                logger.info(f"Dossier sélectionné: {path_selected}")
+                self.dossier_input = path_selected
+                self.line_edit_path.setText(path_selected)
+                self.console.append(f"Dossier sélectionné : {path_selected}")
             else:
                 logger.info("Sélection annulée par l'utilisateur")
-            logger.debug("Dialogue fermé proprement")
+            logger.debug("Dialogue fermé proprement")    
                 
         except Exception as e:
             logger.error(f"Erreur dans choisir_dossier: {str(e)}")
@@ -214,6 +239,7 @@ class MainWindow(QMainWindow):
             # Désactiver les boutons pendant le traitement
             self.button_run.setEnabled(False)
             self.button_browse.setEnabled(False)
+            self.button_use_current.setEnabled(False)
 
             # Nettoyer le thread précédent si existant
             if self.worker_thread and self.worker_thread.isRunning():
@@ -250,18 +276,17 @@ class MainWindow(QMainWindow):
             self.show_error(f"Erreur lors du lancement: {str(e)}")
             self.button_run.setEnabled(True)
             self.button_browse.setEnabled(True)
+            self.button_use_current.setEnabled(True)
 
     def on_traitement_termine(self):
         """Appelé quand le traitement est terminé"""
         try:
             logger.info("Traitement terminé (signal reçu)")
             
-            # Ajouter message dans la console
-            self.console.append("✅ Traitement terminé")
-            
             # Réactiver les boutons
             self.button_run.setEnabled(True)
             self.button_browse.setEnabled(True)
+            self.button_use_current.setEnabled(True)
             
             logger.info("on_traitement_termine terminé avec succès")
             
@@ -272,6 +297,7 @@ class MainWindow(QMainWindow):
             try:
                 self.button_run.setEnabled(True)
                 self.button_browse.setEnabled(True)
+                self.button_use_current
             except:
                 pass
 
@@ -304,7 +330,7 @@ class MainWindow(QMainWindow):
             
             # Ajouter le message dans la console
             try:
-                self.console.append(f"❌ Erreur : {message}")
+                self.console.append(f"Erreur : {message}")
             except Exception as e:
                 logger.error(f"Erreur lors de l'ajout dans la console: {str(e)}")
             
@@ -316,6 +342,7 @@ class MainWindow(QMainWindow):
             # Réactiver les boutons
             self.button_run.setEnabled(True)
             self.button_browse.setEnabled(True)
+            self.button_use_current.setEnabled(True)
             logger.info("Boutons réactivés")
             
         except Exception as e:
@@ -325,6 +352,7 @@ class MainWindow(QMainWindow):
             try:
                 self.button_run.setEnabled(True)
                 self.button_browse.setEnabled(True)
+                self.button_use_current.setEnabled(True)
             except:
                 pass
 
@@ -466,7 +494,7 @@ def normalize_name(filename):
     return name.strip().lower().replace(" ", "_")
 
 
-def traiter_dossier(dossier_input, generer_archive=False, force=False):
+def traiter_dossier(dossier_input, generer_archive=False, force=False, log_signal=None):
     """Traite tous les fichiers .txt d'un dossier"""
     if not os.path.isdir(dossier_input):
         raise ValueError("Le dossier d'entrée est invalide")
@@ -487,13 +515,21 @@ def traiter_dossier(dossier_input, generer_archive=False, force=False):
         chemin_sortie = os.path.join(dossier_output, nom_dossier)
         
         logger.info(f"Traitement de {fichier}...")
+        if log_signal:
+            log_signal.emit(f"Traitement de {fichier}...")
         decoupe_chat(chemin_fichier, chemin_sortie)
         fichiers_traites += 1
 
     logger.info(f"{fichiers_traites} fichier(s) traité(s)")
+    if log_signal:
+        log_signal.emit(f"{fichiers_traites} fichier(s) traité(s)")
 
     if generer_archive:
+        if log_signal:
+            log_signal.emit("Génération de l'archive ZIP...")
         creer_archive_output(dossier_output)
+        if log_signal:
+            log_signal.emit("Archive créée avec succès")
 
 
 def main():
