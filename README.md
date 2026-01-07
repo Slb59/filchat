@@ -42,6 +42,7 @@ gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 ./build.sh
 On obtient une archive .tar.gz contenant l'exécutable
 On obtient aussi un dossier dist-prod contenant le code compilé
+On obtient aussi un fichier dockerfile
 
 # Evolutions possibles
 

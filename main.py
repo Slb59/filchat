@@ -1,5 +1,4 @@
-def main():
-    print("Hello from filchat!")
+from filchat.filchat import main
 
 
 if __name__ == "__main__":
