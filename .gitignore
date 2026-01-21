@@ -22,3 +22,4 @@ dist/
 
 # Fichiers de débogage
 filchat_debug.log
+build.log

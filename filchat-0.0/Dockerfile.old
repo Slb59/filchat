@@ -1,0 +1,34 @@
+FROM ubuntu:20.04
+
+# Installer les dépendances système
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    build-essential \
+ && rm -rf /var/lib/apt/lists/*
+
+# Installer uv
+RUN unalias uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Installer PySide6 et pyinstaller
+RUN uv add pyinstaller PySide6
+
+# Lancer pyinstaller
+RUN pyinstaller --onefile \
+    --windowed \
+    --name "$APP_NAME" \
+    --add-data "README.md:." \
+    --hidden-import "PySide6" \
+    --clean \
+    filchat.py
+
+# Copier l'exécutable et les fichiers nécessaires
+COPY dist-prod/filchat /filchat
+COPY dist-prod/README.txt /README.txt
+
+# Lancer l'application avec Xvfb (pour éviter les problèmes d'affichage)
+CMD ["sh", "-c", "Xvfb :1 -screen 0 1024x768x16 & export DISPLAY=:1 && /filchat"]

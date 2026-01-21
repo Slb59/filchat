@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pyc
+dist
+dist-prod
+build
+.git
+.gitignore
+input
+output
+versions

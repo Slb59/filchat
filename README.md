@@ -39,18 +39,20 @@ uv add gitingest
 gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 
 # creation de l'executable
-./build.sh
+./build.sh > build.log
 On obtient une archive .tar.gz contenant l'exécutable
 On obtient aussi un dossier dist-prod contenant le code compilé
 On obtient aussi un fichier dockerfile
+Pour vérifier un conteneur existant : docker ps -a | grep filchat
 
 # Evolutions possibles
 
-- generer un programme executable
+
 
 # Problèmes à résoudre
 
-Les tableaux ne sont pas correctement formatés.
+- Revoir crash sur pc du bas
+- Les tableaux ne sont pas correctement formatés.
 
 # Versions
 
