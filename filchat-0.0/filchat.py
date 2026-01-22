@@ -1,18 +1,29 @@
-import os
-import sys
-import zipfile
-import shutil
 import logging
+import os
+import shutil
+import sys
 import traceback
+import zipfile
 from datetime import datetime
+
+from PySide6.QtCore import QObject, Qt, QThread, Signal
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLineEdit, QCheckBox, QLabel, QTextEdit, QFileDialog, QMessageBox
+    QApplication,
+    QCheckBox,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide6.QtCore import QThread, Signal, QObject, Qt
 
 # Force l'utilisation de X11
-os.environ['QT_QPA_PLATFORM'] = 'xcb' 
+os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 # Configuration du logger
 logger = logging.getLogger("filchat")
@@ -20,10 +31,13 @@ logger.setLevel(logging.DEBUG)
 
 # Ajouter un handler fichier pour debug
 log_file = os.path.join(os.path.expanduser("."), "filchat_debug.log")
-file_handler = logging.FileHandler(log_file, encoding='utf-8')
+file_handler = logging.FileHandler(log_file, encoding="utf-8")
 file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+file_handler.setFormatter(
+    logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+)
 logger.addHandler(file_handler)
+
 
 class Worker(QObject):
     finished = Signal()
@@ -38,9 +52,13 @@ class Worker(QObject):
 
     def run(self):
         try:
-            logger.info(f"Worker démarré - path={self.path}, archive={self.generer_archive}, force={self.force}")
+            logger.info(
+                f"Worker démarré - path={self.path}, archive={self.generer_archive}, force={self.force}"
+            )
             self.log_signal.emit("Traitement démarré…")
-            traiter_dossier(self.path, self.generer_archive, self.force, self.log_signal)
+            traiter_dossier(
+                self.path, self.generer_archive, self.force, self.log_signal
+            )
             self.log_signal.emit("Traitement terminé avec succès.")
             logger.info("Worker terminé avec succès")
         except RuntimeError as e:
@@ -90,7 +108,9 @@ class MainWindow(QMainWindow):
         input_layout = QHBoxLayout()
         self.label_path = QLabel("Dossier d'entrée :")
         self.line_edit_path = QLineEdit()
-        self.line_edit_path.setPlaceholderText("Saisissez le chemin ou utilisez Parcourir...")
+        self.line_edit_path.setPlaceholderText(
+            "Saisissez le chemin ou utilisez Parcourir..."
+        )
         self.button_browse = QPushButton("Parcourir…")
         self.button_browse.clicked.connect(self.choisir_dossier)
         input_layout.addWidget(self.label_path)
@@ -141,8 +161,7 @@ class MainWindow(QMainWindow):
             self.console.append(f"Répertoire courant défini : {self.dossier_input}")
         except Exception as e:
             logger.error(f"Erreur dans utiliser_repertoire_courant: {str(e)}")
-    
-    
+
     def choisir_dossier(self):
         try:
             logger.info("Ouverture du dialog de sélection de dossier")
@@ -150,14 +169,14 @@ class MainWindow(QMainWindow):
             if self.line_edit_path.text():
                 start_dir = self.line_edit_path.text()
             logger.debug(f"Répertoire de départ: {start_dir}")
-            
+
             # Options pour éviter les crashes sur certains systèmes
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
             options |= QFileDialog.ShowDirsOnly
 
             logger.debug("Création du QFileDialog")
-            
+
             # Méthode défensive : créer explicitement le dialogue
             # dialog = QFileDialog(self)
             # logger.debug("setFileMode")
@@ -171,14 +190,11 @@ class MainWindow(QMainWindow):
             # dialog.setDirectory(start_dir)
             # dialog.setWindowTitle("Sélectionner un dossier")
             path_selected = QFileDialog.getExistingDirectory(
-                self, 
-                "Sélectionner un dossier", 
-                start_dir, 
-                options=options
+                self, "Sélectionner un dossier", start_dir, options=options
             )
-            
+
             logger.debug("Affichage du dialogue")
-            
+
             # Exécuter le dialogue
             # if dialog.exec() == QFileDialog.DialogCode.Accepted:
             #     selected = dialog.selectedFiles()
@@ -201,8 +217,8 @@ class MainWindow(QMainWindow):
                 self.console.append(f"Dossier sélectionné : {path_selected}")
             else:
                 logger.info("Sélection annulée par l'utilisateur")
-            logger.debug("Dialogue fermé proprement")    
-                
+            logger.debug("Dialogue fermé proprement")
+
         except Exception as e:
             logger.error(f"Erreur dans choisir_dossier: {str(e)}")
             logger.error(traceback.format_exc())
@@ -211,7 +227,7 @@ class MainWindow(QMainWindow):
                 "Erreur",
                 f"Impossible d'ouvrir le sélecteur de fichiers.\n\n"
                 f"Erreur: {str(e)}\n\n"
-                f"Vous pouvez saisir le chemin manuellement dans le champ texte."
+                f"Vous pouvez saisir le chemin manuellement dans le champ texte.",
             )
 
     def log(self, message):
@@ -230,12 +246,16 @@ class MainWindow(QMainWindow):
             logger.info("Lancement du traitement")
             path = self.line_edit_path.text().strip()
             if not path:
-                QMessageBox.critical(self, "Erreur", "Veuillez sélectionner un dossier d'entrée")
+                QMessageBox.critical(
+                    self, "Erreur", "Veuillez sélectionner un dossier d'entrée"
+                )
                 return
             if not os.path.isdir(path):
-                QMessageBox.critical(self, "Erreur", f"Le dossier '{path}' n'existe pas")
+                QMessageBox.critical(
+                    self, "Erreur", f"Le dossier '{path}' n'existe pas"
+                )
                 return
-            
+
             # Désactiver les boutons pendant le traitement
             self.button_run.setEnabled(False)
             self.button_browse.setEnabled(False)
@@ -249,9 +269,7 @@ class MainWindow(QMainWindow):
 
             self.worker_thread = QThread()
             self.worker = Worker(
-                path,
-                self.check_archive.isChecked(),
-                self.check_force.isChecked()
+                path, self.check_archive.isChecked(), self.check_force.isChecked()
             )
             self.worker.moveToThread(self.worker_thread)
 
@@ -263,13 +281,13 @@ class MainWindow(QMainWindow):
             self.worker.finished.connect(self.on_traitement_termine)
             self.worker.finished.connect(self.worker_thread.quit)
             self.worker_thread.finished.connect(self.on_thread_finished)
-            
+
             # Démarrer le thread
             self.worker_thread.started.connect(self.worker.run)
             self.worker_thread.start()
 
             logger.info("Thread de traitement démarré")
-            
+
         except Exception as e:
             logger.error(f"Erreur dans lancer_traitement: {str(e)}")
             logger.error(traceback.format_exc())
@@ -282,14 +300,14 @@ class MainWindow(QMainWindow):
         """Appelé quand le traitement est terminé"""
         try:
             logger.info("Traitement terminé (signal reçu)")
-            
+
             # Réactiver les boutons
             self.button_run.setEnabled(True)
             self.button_browse.setEnabled(True)
             self.button_use_current.setEnabled(True)
-            
+
             logger.info("on_traitement_termine terminé avec succès")
-            
+
         except Exception as e:
             logger.error(f"Erreur dans on_traitement_termine: {str(e)}")
             logger.error(traceback.format_exc())
@@ -305,20 +323,20 @@ class MainWindow(QMainWindow):
         """Appelé quand le thread est complètement terminé"""
         try:
             logger.info("Thread terminé, nettoyage...")
-            
+
             # Utiliser deleteLater() qui est plus sûr en Qt
             if self.worker:
                 logger.debug("Suppression du worker")
                 self.worker.deleteLater()
                 self.worker = None
-            
+
             if self.worker_thread:
                 logger.debug("Suppression du worker_thread")
                 self.worker_thread.deleteLater()
                 self.worker_thread = None
-            
+
             logger.info("Nettoyage terminé")
-            
+
         except Exception as e:
             logger.error(f"Erreur dans on_thread_finished: {str(e)}")
             logger.error(traceback.format_exc())
@@ -327,24 +345,24 @@ class MainWindow(QMainWindow):
         """Affiche une erreur (doit être appelé depuis le thread principal)"""
         try:
             logger.info(f"show_error appelé avec: {message}")
-            
+
             # Ajouter le message dans la console
             try:
                 self.console.append(f"Erreur : {message}")
             except Exception as e:
                 logger.error(f"Erreur lors de l'ajout dans la console: {str(e)}")
-            
+
             # Afficher la boîte de dialogue (méthode simple)
             logger.info("Affichage de QMessageBox")
             QMessageBox.critical(self, "Erreur", message)
             logger.info("QMessageBox fermée")
-            
+
             # Réactiver les boutons
             self.button_run.setEnabled(True)
             self.button_browse.setEnabled(True)
             self.button_use_current.setEnabled(True)
             logger.info("Boutons réactivés")
-            
+
         except Exception as e:
             logger.error(f"Erreur dans show_error: {str(e)}")
             logger.error(traceback.format_exc())
@@ -368,7 +386,7 @@ class MainWindow(QMainWindow):
                     "Traitement en cours",
                     "Un traitement est en cours. Voulez-vous vraiment quitter ?",
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No
+                    QMessageBox.StandardButton.No,
                 )
 
                 if reply == QMessageBox.StandardButton.Yes:
@@ -513,7 +531,7 @@ def traiter_dossier(dossier_input, generer_archive=False, force=False, log_signa
         chemin_fichier = os.path.join(dossier_input, fichier)
         nom_dossier = normalize_name(fichier)
         chemin_sortie = os.path.join(dossier_output, nom_dossier)
-        
+
         logger.info(f"Traitement de {fichier}...")
         if log_signal:
             log_signal.emit(f"Traitement de {fichier}...")
