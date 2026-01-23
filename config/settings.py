@@ -20,6 +20,7 @@ VERSION = get_version()
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+WAGTAIL_SITE_NAME = env("WAGTAIL_SITE_NAME")
 # NPM_BIN_PATH =env("NPM_BIN_PATH ")
 
 # Application definition
@@ -36,6 +37,24 @@ DJANGO_APPS = [
 PROJECT_APPS = []
 
 THIRD_PARTY_APPS = [
+    # Wagtail core
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
+
+    # Wagtail addons utiles
+    "modelcluster",
+    "taggit",
+
+    # Tailwind
     "tailwind",
     "theme",
 ]
@@ -61,6 +80,7 @@ DJANGO_MIDDLEWARE = [
 
 TIERS_MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
 MIDDLEWARE = DJANGO_MIDDLEWARE + TIERS_MIDDLEWARE
@@ -118,12 +138,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
-
+LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -132,3 +149,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Media
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
