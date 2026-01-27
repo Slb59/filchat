@@ -53,11 +53,27 @@ gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 # Instructions pour le build
 
 ## creation de l'executable
-./build.sh > build.log
-On obtient une archive .tar.gz contenant l'exécutable
-On obtient aussi un dossier dist-prod contenant le code compilé
-On obtient aussi un fichier dockerfile
-Pour vérifier un conteneur existant : docker ps -a | grep filchat
+
+### compte system dédie
+sudo useradd -r -s /usr/sbin/nologin filchat
+sudo chown -R filchat:filchat /opt/filchat
+
+### service global (multi user)
+copier ficlchat.service dans /etc/systemd/system
+
+### activation
+sudo systemctl daemon-reload
+sudo systemctl enable filchat
+sudo systemctl restart filchat
+
+### à faire uniquement à l'installation
+sudo -u filchat /opt/filchat/venv/bin/python manage.py migrate
+
+### test après installation
+systemctl status filchat
+ls /opt/filchat/data/db.sqlite3
+curl http://localhost:8000
+
 
 # Evolutions
 

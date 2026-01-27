@@ -1,5 +1,8 @@
-- 0.1.0 : modification du choix de l'interface graphique de PySide6 à Django
+- 0.1.1 : revue de la procédure de déploiement
 
+
+- 0.1.0 : modification du choix de l'interface graphique de PySide6 à Django
+20260126 : creation de la procédure de déploiement
 
 - 0.0.6 : ajout les fichiers d'installation
 20260119 : ajout de l'icone et génération du fichier desktop
