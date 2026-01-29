@@ -1,3 +1,4 @@
+# config.urls.py
 """
 URL configuration for filchat project.
 
@@ -17,10 +18,12 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
+    path("filchat/", include("filchat.urls")),
 
     # Wagtail pages (doit rester en dernier)
     path("", include(wagtail_urls)),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
