@@ -2,9 +2,11 @@
 __pycache__/
 filchat-0.0/
 tests/
-install.sh
 .git/
 .gitignore
 makefile
 .installignore
 data/
+build.sh
+install.sh
+versions/

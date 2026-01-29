@@ -52,13 +52,22 @@ gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 
 # Instructions pour le build
 
+## creation du fichier zip
+./build.sh
+copy the /build files in an installation directory and lunch the install.sh script
+installation directory could be secretbox in journalling for exemple
+
 ## creation de l'executable
+
+### installation sous /opt/filchat
+sudo ./install.sh
+This file install a service in the systeme so that the application can be accessed from the web.
 
 ### compte system dédie
 sudo useradd -r -s /usr/sbin/nologin filchat
 sudo chown -R filchat:filchat /opt/filchat
 
-### service global (multi user)
+### pour un service global (multi user)
 copier ficlchat.service dans /etc/systemd/system
 
 ### activation
@@ -67,12 +76,16 @@ sudo systemctl enable filchat
 sudo systemctl restart filchat
 
 ### à faire uniquement à l'installation
-sudo -u filchat /opt/filchat/venv/bin/python manage.py migrate
+sudo -u filchat /opt/filchat/app/.venv/bin/python manage.py migrate
 
 ### test après installation
 systemctl status filchat
-ls /opt/filchat/data/db.sqlite3
-curl http://localhost:8000
+ls /opt/filchat/data/prod/db.sqlite3
+curl http://localhost:9000
+
+### problème lié à l'espace disque mangé
+sudo du -xh / | sort -h | tail -30
+sudo pacman -Sc
 
 
 # Evolutions

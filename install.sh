@@ -3,10 +3,10 @@ set -e
 
 APP_PORT="9000"
 APP_NAME="filchat"
-APP_USER="filchat"
+APP_USER="root"
 APP_BASE="/opt/filchat"
 DATA_DIR="$APP_BASE/data/prod"
-APP_DIR="$APP_BASE"
+APP_DIR="$APP_BASE/app"
 VENV_DIR="$APP_DIR/.venv"
 echo "▶ Installation de $APP_NAME"
 
@@ -41,7 +41,7 @@ if ! id "$APP_USER" >/dev/null 2>&1; then
   useradd --system --home "$APP_BASE" --shell /usr/sbin/nologin "$APP_USER"
 fi
 
-rm -rf "$APP_DIR"
+rm -rf "$VENV_DIR"
 mkdir -p "$APP_DIR" "$DATA_DIR"
 chown -R "$APP_USER:$APP_USER" "$APP_BASE"
 
@@ -57,16 +57,22 @@ fi
 # 5. Copie du projet
 # -------------------------
 echo "▶ Copie du projet"
-rsync -av --delete --exclude-from='.installignore' ./ "$APP_DIR/"
+# rsync -av --delete --exclude-from='.installignore' ./ "$APP_DIR/"
+VERSION="$(tr -d '[:space:]' < VERSION)"
+ARCHIVE_NAME="${APP_NAME}-${VERSION}.7z"
+echo "▶ Archive : $ARCHIVE_NAME"
+sudo 7z x "$ARCHIVE_NAME" -o"$APP_DIR" -y
 
 # -------------------------
 # 6. Environnement Python
 # -------------------------
 echo "▶ Création du venv"
 chown -R "$APP_USER:$APP_USER" "$APP_BASE"
+chmod -R 755 "$APP_BASE"
 sudo -u "$APP_USER" uv venv "$VENV_DIR" --clear
+chown -R "$APP_USER:$APP_USER" "$VENV_DIR"
 
-echo "▶ Nettoyage du cache Python"
+echo "▶ Nettoyage du cache Python depuis $APP_DIR"
 cd "$APP_DIR"
 source .venv/bin/activate
 find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
@@ -94,7 +100,6 @@ After=network.target
 
 [Service]
 User=$APP_USER
-Group=$APP_USER
 WorkingDirectory=$APP_DIR
 ExecStart=$VENV_DIR/bin/python manage.py runserver 127.0.0.1:$APP_PORT
 Restart=always
@@ -107,6 +112,7 @@ EOF
 systemctl daemon-reload
 systemctl enable filchat
 systemctl restart filchat
+systemctl status filchat
 
 # -------------------------
 # 9. Fin
