@@ -1,20 +1,33 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="fr">
+{% extends "wagtailadmin/base.html" %}
+{% load static wagtailcore_tags %}
 
-{% include "base/head.html"%}
+{% block bodyclass %}template-filchatpage flex flex-col min-h-screen bg-gray-50{% endblock %}
 
-<body id="page-top">
-            {% include "base/header.html"%}
+{% block content %}
 
-            <main>
-                    <div id="content">
-                        {% block content %}
-                        {% endblock content %}
-                        </div>
-                </main>
+{% block extra_head %}
+    {{ block.super }}
+    {% include "head.html"%}
+{% endblock %}
 
-            {% include "base/footer.html"%}
-        </body>
+{% block content %}
+    {% include "header.html"%}
 
-</html>
+    <main class="grow">
+        <div class="container mx-auto px-4 py-8">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="my-4 p-4 rounded {% if message.tags %}bg-{{message.tags}}-100 text-{{message.tags}}-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% block page_content %}{% endblock %}
+        </div>
+    </main>
+
+    {% include "footer.html"%}
+    {% block extra_js %}{% endblock %}
+
+{% endblock %}

@@ -20,12 +20,7 @@ python filchat.py input O
 
 option possible : --force -> vide automatiquement le dossier output
 
-### Mode interface
-
-#### en version 0.0 (PySide6)
-```bash 
-python filchat.py
-```
+### Lancement en développement
 
 #### en version 0.1 (Web)
 ```bash

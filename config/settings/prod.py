@@ -1,3 +1,4 @@
+# config.settings.prod.py
 from .base import *
 
 DEBUG = False
@@ -13,3 +14,7 @@ DATABASES = {
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# doit être modifié si déploiement sur serveur web
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+INTERNAL_IPS = ["127.0.0.1",]

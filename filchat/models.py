@@ -13,4 +13,7 @@ class FilChat(models.Model):
 
 class FilChatPage(Page):
     template = "filchat/filchat_page.html"
-    content_panels = Page.content_panels
+    intro = RichTextField(blank=True)
+    content_panels = Page.content_panels + [
+        FieldPanel('intro'),
+    ]

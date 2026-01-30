@@ -15,7 +15,7 @@ def upload_file(request):
         chat_file = FilChat(file=request.FILES['file'])
         chat_file.save()
         return redirect('process_file', file_id=chat_file.id)
-    return render(request, 'filchat/upload.html')
+    return render(request, 'filchat/upload.html', {'current_year': datetime.now().year})
 
 def process_file(request, file_id):
     chat_file = FilChat.objects.get(id=file_id)
@@ -38,7 +38,9 @@ def process_file(request, file_id):
             )
         except Exception as e:
             return HttpResponse(f"Erreur lors du traitement: {str(e)}", status=500)
-    return render(request, 'filchat.results.html', {'file_id': file_id})
+    return render(request, 'filchat.results.html',
+        {'file_id': file_id, 'current_year': datetime.now().year}
+    )
 
 def download_file(request, file_id):
     chat_file = FilChat.objects.get(id=file_id)
