@@ -50,7 +50,7 @@ uv add <nom de la librairie>
 
 ### pour extraire le code
 uv add gitingest
-gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
+uv run gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 
 # Instructions pour le build
 

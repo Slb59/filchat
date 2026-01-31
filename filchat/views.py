@@ -10,6 +10,10 @@ from django.conf import settings
 from .models import FilChat
 from .utils import decoupe_chat, creer_archive_output
 
+def home(request):
+    return render(request, 'filchat/filchat_page.html', {'current_year': datetime.now().year})
+
+
 def upload_file(request):
     if request.method == 'POST' and request.FILES.get('file'):
         chat_file = FilChat(file=request.FILES['file'])

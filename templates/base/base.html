@@ -3,15 +3,13 @@
 
 {% block bodyclass %}template-filchatpage flex flex-col min-h-screen bg-gray-50{% endblock %}
 
-{% block content %}
-
 {% block extra_head %}
     {{ block.super }}
-    {% include "head.html"%}
+    {% include "base/head.html"%}
 {% endblock %}
 
 {% block content %}
-    {% include "header.html"%}
+    {% include "base/header.html"%}
 
     <main class="grow">
         <div class="container mx-auto px-4 py-8">
@@ -27,7 +25,7 @@
         </div>
     </main>
 
-    {% include "footer.html"%}
+    {% include "base/footer.html"%}
     {% block extra_js %}{% endblock %}
 
 {% endblock %}

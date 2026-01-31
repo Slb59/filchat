@@ -4,15 +4,6 @@
         <a href="{% url 'home' %}" class="text-xl font-bold">FilChat</a>
 
         <!-- Navigation -->
-        <nav>
-            <ul class="flex space-x-4">
-                <li><a href="{% url 'upload_file' %}" class="hover:text-blue-600">Uploader</a></li>
-                {% if user.is_authenticated %}
-                <li><a href="{% url 'account_logout' %}" class="hover:text-blue-600">Déconnexion</a></li>
-                {% else %}
-                <li><a href="{% url 'account_login' %}" class="hover:text-blue-600">Connexion</a></li>
-                {% endif %}
-            </ul>
-        </nav>
+
     </div>
 </header>

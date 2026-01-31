@@ -15,6 +15,7 @@ dependencies = [
     "django-extensions>=4.1",
     "django-tailwind>=4.2.0",
     "flake8-pyproject>=1.2.4",
+    "gitingest>=0.3.1",
     "pillow>=12.1.0",
     "pyinstaller>=6.17.0",
     "pyside6>=6.10.1",
