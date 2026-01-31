@@ -24,8 +24,15 @@ option possible : --force -> vide automatiquement le dossier output
 
 #### en version 0.1 (Web)
 ```bash
+make run-front
 make run
 ```
+
+mkdir -p staticfiles static
+python manage.py collectstatic
+python manage.py compress
+chmod -R 755 staticfiles static
+
 
 👉 http://127.0.0.1:8000/django-admin/  (Wagtail admin)
 👉 http://127.0.0.1:8000/admin/  (Wagtail admin)

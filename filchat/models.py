@@ -2,6 +2,8 @@
 from django.db import models
 from wagtail.models import Page
 from wagtail.admin.panels import FieldPanel
+from wagtail.fields import RichTextField
+
 
 class FilChat(models.Model):
     file = models.FileField(upload_to='uploads/')
@@ -10,6 +12,7 @@ class FilChat(models.Model):
 
     def __str__(self):
         return self.file.name
+
 
 class FilChatPage(Page):
     template = "filchat/filchat_page.html"

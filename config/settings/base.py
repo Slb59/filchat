@@ -22,6 +22,7 @@ VERSION = get_version()
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 WAGTAIL_SITE_NAME = env("WAGTAIL_SITE_NAME")
+WAGTAILADMIN_BASE_URL = "/"
 # NPM_BIN_PATH =env("NPM_BIN_PATH ")
 
 # Application definition
@@ -34,9 +35,12 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "compressor",
+    
 ]
 
-PROJECT_APPS = []
+PROJECT_APPS = [
+    "filchat",
+]
 
 THIRD_PARTY_APPS = [
     # Wagtail core
@@ -85,14 +89,14 @@ TIERS_MIDDLEWARE = [
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
-MIDDLEWARE = DJANGO_MIDDLEWARE + TIERS_MIDDLEWARE
+MIDDLEWARE = TIERS_MIDDLEWARE + DJANGO_MIDDLEWARE
 
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -136,12 +140,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"),]
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 ]
+
+COMPRESS_ENABLED = True
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+COMPRESS_ROOT = STATIC_ROOT
 
 # Media
 MEDIA_URL = "/media/"
