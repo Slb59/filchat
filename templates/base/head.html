@@ -3,11 +3,11 @@
 {% load custom_filters %}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>
-    {% block title %}
-        {% if page.title %}{{page.title|truncate_title:50}}{% else %}FilChat{% endif %}
-    {% endblock %}
-</title>
+
+{% block title %}
+    {% if page.title %}{{page.title|truncate_title:50}}{% else %}SecretBox{% endif %}
+{% endblock %}
+
 
 {# Tailwind CSS #}
 <link rel="stylesheet" href="{% static 'css/output.css' %}">

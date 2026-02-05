@@ -34,7 +34,7 @@ python manage.py compress
 chmod -R 755 staticfiles static
 
 
-👉 http://127.0.0.1:8000/django-admin/  (Wagtail admin)
+👉 http://127.0.0.1:8000/django-admin/  (Django admin)
 👉 http://127.0.0.1:8000/admin/  (Wagtail admin)
 👉 http://127.0.0.1:8000/  (site)
 

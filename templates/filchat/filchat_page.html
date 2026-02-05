@@ -30,7 +30,7 @@
     {# Section pour afficher les résultats (si un fichier a été traité) #}
     {% if file_id %}
     <div class="bg-green-50 p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Résultats</h2>
+        <h2 class="text-xl font-semibold mb-4">Résultats du traitement</h2>
         <p class="mb-4">Votre fichier a été traité avec succès !</p>
         <a href="{% url 'download_file' file_id=file_id %}"
             class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">

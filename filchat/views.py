@@ -10,16 +10,13 @@ from django.conf import settings
 from .models import FilChat
 from .utils import decoupe_chat, creer_archive_output
 
+
 def home(request):
-    return render(request, 'filchat/filchat_page.html', {'current_year': datetime.now().year})
-
-
-def upload_file(request):
     if request.method == 'POST' and request.FILES.get('file'):
         chat_file = FilChat(file=request.FILES['file'])
         chat_file.save()
         return redirect('process_file', file_id=chat_file.id)
-    return render(request, 'filchat/upload.html', {'current_year': datetime.now().year})
+    return render(request, 'filchat/filchat_page.html', {'current_year': datetime.now().year})
 
 def process_file(request, file_id):
     chat_file = FilChat.objects.get(id=file_id)
@@ -37,16 +34,18 @@ def process_file(request, file_id):
             chat_file.save()
             return render(
                 request, 
-                'filchat/results.html', 
+                'filchat/filchat_page.html', 
                 {'file_id': file_id, 'archive_path': archive_path}
             )
         except Exception as e:
             return HttpResponse(f"Erreur lors du traitement: {str(e)}", status=500)
-    return render(request, 'filchat.results.html',
+    return render(request, 'filchat.filchat_page.html',
         {'file_id': file_id, 'current_year': datetime.now().year}
     )
 
 def download_file(request, file_id):
     chat_file = FilChat.objects.get(id=file_id)
-    archive_path = os.path.join(settings.MEDIA_ROOT, 'output', str(chat_file.id), 'archive.zip')
+    date_du_jour = datetime.now().strftime("%Y%m%d")
+    nom_archive = f"{date_du_jour}.zip"
+    archive_path = os.path.join(settings.MEDIA_ROOT, 'output', str(chat_file.id), nom_archive)
     return FileResponse(open(archive_path, 'rb'), as_attachment=True) 
