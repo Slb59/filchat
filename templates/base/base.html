@@ -1,31 +1,50 @@
-{% extends "wagtailadmin/base.html" %}
-{% load static wagtailcore_tags %}
+{% load static wagtailcore_tags wagtailuserbar %}
+<!doctype html>
+<html lang="fr">
 
-{% block bodyclass %}template-filchatpage flex flex-col min-h-screen bg-gray-50{% endblock %}
+{% include "head.html"%}
 
-{% block extra_head %}
-    {{ block.super }}
-    {% include "base/head.html"%}
-{% endblock %}
+<body class="d-flex flex-column min-vh-100">
 
-{% block content %}
-    {% include "base/header.html"%}
+    <nav class="navbar navbar-expand-lg shadow" style="background-color: white;">
+        <div class="container-fluid" style="background-color: white;">
+            <a class="navbar-brand" href="{% slugurl 'secretbox' %}">Accueil</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    
+                    
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% slugurl 'filchat' %}">FilChat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% slugurl 'contact' %}">Contact</a>
+                    </li>
 
-    <main class="grow">
-        <div class="container mx-auto px-4 py-8">
-            {% if messages %}
-            {% for message in messages %}
-            <div class="my-4 p-4 rounded {% if message.tags %}bg-{{message.tags}}-100 text-{{message.tags}}-800{% endif %}">
-                {{ message }}
+                </ul>
+                
             </div>
-            {% endfor %}
-            {% endif %}
-
-            {% block page_content %}{% endblock %}
         </div>
-    </main>
+    </nav>
+    {% wagtailuserbar %}
+    {% block body %}{% endblock %}
+    {% block page_content %}{% endblock %}
+    
+    <div class="container-fluid text-center mt-auto p-5 rounded" style="background-color: rgb(34, 31, 31);">        
+        <hr>
+        {% include "footer.html"%}
 
-    {% include "base/footer.html"%}
-    {% block extra_js %}{% endblock %}
+    </div>
+    
 
-{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

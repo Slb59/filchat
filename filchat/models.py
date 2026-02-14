@@ -14,7 +14,7 @@ class FilChat(models.Model):
         return self.file.name
 
 
-class FilChatPage(Page):
+class FilchatPage(Page):
     template = "filchat/filchat_page.html"
     body = RichTextField(blank=True)
     content_panels = Page.content_panels + [

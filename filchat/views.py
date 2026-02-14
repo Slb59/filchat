@@ -15,7 +15,7 @@ def home(request):
     if request.method == 'POST' and request.FILES.get('file'):
         chat_file = FilChat(file=request.FILES['file'])
         chat_file.save()
-        return redirect('process_file', file_id=chat_file.id)
+        return redirect('filchat:process_file', file_id=chat_file.id)
     return render(request, 'filchat/filchat_page.html', {'current_year': datetime.now().year})
 
 def process_file(request, file_id):

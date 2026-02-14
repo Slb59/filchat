@@ -1,0 +1,29 @@
+{% load static %}
+{% load compress %}
+{% load custom_filters %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% block title %}
+    {% if page.title %}{{page.title|truncate_title:50}}{% else %}SecretBox{% endif %}
+{% endblock %}
+
+{% block title_suffix %}
+    {% wagtail_site as current_site %}
+    {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
+{% endblock %}
+
+{# Tailwind CSS #}
+<link rel="stylesheet" href="{% static 'css/output.css' %}">
+
+{# Favicon #}
+<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+
+<!-- custom css compressé avec django-compressor -->
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endcompress %}
+
+<!-- Balises meta supplémentaires -->
+<meta name="description" content="SecretBox - Tableau de bord personnel">
+{% block extra_head %}{% endblock %}

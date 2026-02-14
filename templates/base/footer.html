@@ -1,5 +1,9 @@
 <footer class="bg-gray-800 text-white py-6">
     <div class="container mx-auto px-4 text-center">
-        <p>&copy; {{ current_year }}-Osynia SecretBox. Tous droits réservés.</p>
+        <p>&copy; {{ current_year }}-Osynia SecretBox. Tous droits réservés.
+        {% if request.user.is_superuser %}
+        -
+        <a href="{% url 'admin:index' %}">Administration avancée</a>
+        {% endif %}</p>
     </div>
 </footer>

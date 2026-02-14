@@ -21,12 +21,13 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
+    path("secretbox/", include("secretbox.urls")),
     path("filchat/", include("filchat.urls")),
 
+    # path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
     # Wagtail pages (doit rester en dernier)
     path("", include(wagtail_urls)),
-
-    path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
+    
 ]
 
 

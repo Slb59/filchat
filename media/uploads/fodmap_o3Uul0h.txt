@@ -1,0 +1,241 @@
+Ignorer et passer au contenu
+Historique de chat
+
+
+Vous avez dit :
+Dans le cadre d'un régime sans fodmap, puis-je manger des petits pois ?
+ChatGPT a dit :
+Dans un régime pauvre en FODMAP (souvent recommandé pour les personnes souffrant de syndrome de l’intestin irritable – SII), la consommation de petits pois doit être prudente, car leur teneur en FODMAP varie selon le type et la quantité.
+
+Voici le détail selon les données de l’Université Monash, référence mondiale sur le sujet :
+
+🟢 Petits pois frais (pois verts)
+Quantité faible (≤ 15 g, soit environ 1 cuillère à soupe) → Faible en FODMAP ✅
+
+Quantité moyenne (≈ 30 g) → Teneur modérée en FODMAP ⚠️
+
+Au-delà de 45 g (≈ 3 cuillères à soupe) → Riche en FODMAP ❌
+
+🟢 Petits pois en boîte (pois verts en conserve)
+Meilleurs tolérés car une partie des FODMAP se dissout dans l’eau de conservation.
+
+≈ 40 g égouttés → Faible en FODMAP ✅
+
+≥ 60 g → Peut devenir riche en FODMAP ⚠️
+
+🔴 Pois cassés / pois secs (soupe, purée, farine)
+Très riches en FODMAP → à éviter ❌
+
+Conseils pratiques
+Si tu souhaites en consommer, privilégie les petits pois en conserve, bien égouttés et rincés.
+
+Intègre-les en petite quantité dans des plats, plutôt que comme légume principal.
+
+Surveille la réaction de ton système digestif, car la tolérance varie d’une personne à l’autre.
+
+Si tu veux, je peux te préparer un tableau clair avec les quantités exactes de petits pois, pois chiches, lentilles, etc., et leur teneur en FODMAP. Ça pourrait t’aider à composer tes repas. Veux-tu que je le fasse ?
+
+Vous avez dit :
+Cette recette de pommes noisette, peut-elle me convenir ?
+Pommes de terre 90% (pommes de terre, pommes de terre déshydratées), huile de tournesol 6,8%, amidon de pomme de terre, fibre de pois, amidon de pois, sel, dextrose, poivre blanc, curcuma. Peut contenir des Traces de céréales contenant du GLUTEN, de LAIT et d'OEUF.
+ChatGPT a dit :
+Je vais analyser la composition de cette recette de pommes noisette pour voir si elle est compatible avec un régime pauvre en FODMAP :
+
+Analyse ingrédient par ingrédient 🧐
+✅ Ingrédients compatibles avec un régime sans FODMAP :
+Pommes de terre (90 %, y compris déshydratées) → Faible en FODMAP ✅
+
+Huile de tournesol → Sans FODMAP ✅
+
+Amidon de pomme de terre → Sans FODMAP ✅
+
+Sel, poivre blanc, curcuma → Sans FODMAP ✅
+
+⚠️ Ingrédients à surveiller :
+Fibre de pois → Peut contenir des galacto-oligosaccharides (GOS), un type de FODMAP.
+
+Généralement problématique en quantité importante, mais vu que ce n’est pas l’ingrédient principal, l’impact peut être faible.
+
+Amidon de pois → Moins problématique que la fibre, car l’amidon contient peu de FODMAP.
+
+ℹ️ Autres mentions :
+Dextrose → Sucre simple, sans FODMAP ✅
+
+Traces possibles de gluten, lait et œuf → Pas de problème pour le FODMAP, sauf si tu es intolérant au lactose ou allergique.
+
+Verdict 🟡
+Globalement, cette recette peut convenir à un régime pauvre en FODMAP si tu en consommes en petite quantité.
+
+Le seul point d’attention : la fibre de pois, qui peut poser problème pour certaines personnes sensibles.
+
+Si tu débutes le régime ou si tu es en phase stricte (phase d’éviction), il peut être plus prudent de tester une petite portion (5-6 pommes noisette) et observer ta tolérance.
+
+Si tu veux, je peux te préparer une liste claire des additifs et ingrédients "pièges" à surveiller sur les étiquettes pour éviter les FODMAP cachés. Ça pourrait t’aider à faire tes courses plus facilement.
+
+Veux-tu que je te fasse cette liste ?
+
+Vous avez dit :
+Est-ce que je peux consommé des pates au blé complet ?
+ChatGPT a dit :
+Je vais te répondre précisément 🙂
+
+Dans le cadre d’un régime pauvre en FODMAP, la consommation de pâtes au blé complet est généralement déconseillée 🚫, mais il y a des nuances selon la quantité et le type de blé.
+
+Pourquoi les pâtes au blé complet posent problème
+Le blé, surtout complet, contient beaucoup de fructanes, une famille de FODMAP.
+
+Plus la farine est complète, plus la teneur en FODMAP est élevée, car l’enveloppe du grain concentre les fructanes.
+
+Cela peut provoquer ballonnements, gaz et inconfort digestif chez les personnes sensibles.
+
+Quantités testées par l’Université Monash (référence FODMAP)
+Pâtes au blé blanc :
+
+74 g cuites → Faible en FODMAP ✅
+
+> 120 g cuites → Riche en FODMAP ❌
+
+Pâtes au blé complet :
+
+35 g cuites → Faible en FODMAP ✅
+
+> 60 g cuites → Riche en FODMAP ❌
+
+Donc, si tu veux en manger, il vaut mieux limiter la portion à environ 30 à 40 g cuits (ce qui correspond à ~15 g crus). C’est très peu, ce qui rend souvent les pâtes au blé complet peu pratiques dans un régime sans FODMAP.
+
+Alternatives pauvres en FODMAP 🍝
+Voici des options de pâtes mieux tolérées :
+
+Pâtes sans gluten (maïs, riz, quinoa, millet, sarrasin) ✅
+
+Pâtes de riz ✅
+
+Pâtes de maïs ✅
+
+Pâtes de quinoa ✅
+
+Pâtes de sarrasin 100 % ✅
+
+⚠️ Attention : certaines pâtes sans gluten contiennent un mélange de farines, dont pois chiches, lentilles ou fèves, qui peuvent être riches en FODMAP. Il faut bien lire les étiquettes.
+
+Si tu veux, je peux te préparer un tableau complet avec :
+
+Les différents types de pâtes
+
+Le grammage toléré
+
+Les alternatives pauvres en FODMAP
+
+Ça pourrait t’aider à planifier tes repas sans te priver.
+Veux-tu que je te le fasse ?
+
+Vous avez dit :
+Est-ce que dans le cadre de mon régime sans fodmap, je peux boire cette boisson ?
+Kombucha*gazéifié (eau filtrée, sucre de canne blond* (consommé en grande partie lors
+de la fermentation), thé vert*, culture de kombucha*), jus de gingembre* 0,8%, extrait de
+gingembre*. Peut contenir des traces d'alcool (1.2%vol.)
+ChatGPT a dit :
+Bonne question, le kombucha fait souvent hésiter en FODMAP 🙂
+
+👉 Réponse courte
+Oui, tu peux en boire, mais avec prudence et en petite quantité ⚠️
+
+🔍 Analyse FODMAP ingrédient par ingrédient
+✅ Ingrédients globalement compatibles
+Eau, thé vert → sans FODMAP
+
+Sucre de canne → le saccharose n’est pas un FODMAP, et il est en grande partie consommé lors de la fermentation
+
+Gingembre (jus + extrait) → pauvre en FODMAP
+
+Traces d’alcool (1,2 %) → pas un FODMAP en soi
+
+⚠️ Points de vigilance
+Fermentation :
+
+Le kombucha peut contenir des fructanes résiduels selon la durée et le procédé de fermentation.
+
+Boisson gazeuse :
+
+Le gaz peut provoquer ballonnements et douleurs, même si la boisson est pauvre en FODMAP.
+
+Sensibilité individuelle :
+
+Certaines personnes avec un SII réagissent mal aux boissons fermentées, indépendamment des FODMAP.
+
+🟡 Verdict FODMAP
+Tolérable en petite quantité
+
+À éviter en grande portion, surtout en phase d’éviction stricte
+
+🥤 Quantité conseillée
+Commence par 100 ml maximum
+
+Bois-le lentement, de préférence au cours d’un repas
+
+Évite d’en consommer tous les jours au début
+
+❌ À éviter si :
+Tu es en phase d’éviction stricte
+
+Tu réagis mal aux boissons gazeuses
+
+Tu observes des symptômes après les aliments fermentés
+
+✅ Alternatives plus sûres en phase stricte
+Eau plate ou légèrement aromatisée maison
+
+Thé vert ou noir refroidi
+
+Infusion de gingembre (non fermentée)
+
+Si tu veux, je peux aussi t’aider à savoir quelles boissons fermentées sont les mieux tolérées (kéfir, kombucha, yaourts à boire, etc.) selon les phases du régime FODMAP.
+
+Vous avez dit :
+Est-ce que je peux manger ce produit ?Ingrédients : LAIT pasteurisé de vache, sel, présure, ferments lactiques et d'affinage dont Penicillium roqueforti. Élaboré à partir de lait origine France, collecté dans la zone d'appellation.
+ChatGPT a dit :
+Oui, ce produit peut être consommé dans le cadre d’un régime pauvre en FODMAP, avec modération 🙂
+D’après la liste d’ingrédients, il s’agit clairement d’un fromage à pâte persillée type Roquefort / bleu.
+
+🔍 Analyse FODMAP des ingrédients
+Lait de vache → contient du lactose, mais
+👉 lors de l’affinage, le lactose est presque entièrement consommé par les ferments
+
+Ferments lactiques & d’affinage (Penicillium roqueforti) → sans FODMAP
+
+Sel, présure → sans FODMAP
+
+👉 Les fromages affinés sont généralement pauvres en lactose, donc compatibles FODMAP.
+
+🟢 Verdict FODMAP
+Autorisé dans un régime sans FODMAP ✅
+
+Mieux toléré que les fromages frais (fromage blanc, ricotta, faisselle…)
+
+🧀 Quantité conseillée
+Portion sûre : 30 à 40 g (≈ une petite part)
+
+Évite d’en manger en grande quantité, surtout si tu es sensible au gras ou aux fromages forts
+
+⚠️ Points à surveiller (hors FODMAP)
+Fromage riche en matières grasses → peut déclencher des symptômes digestifs indépendamment des FODMAP
+
+Goût puissant → parfois mal toléré chez les intestins sensibles
+
+✅ Fromages généralement bien tolérés en FODMAP
+Comté, Emmental, Gruyère
+
+Parmesan, Pecorino
+
+Cheddar
+
+Roquefort, Bleu, Gorgonzola
+
+Si tu veux, je peux te faire une liste claire des fromages à privilégier / éviter selon le régime FODMAP.
+
+
+
+
+Aucun fichier choisiAucun fichier choisi
+ChatGPT peut commettre des erreurs. Il est recommandé de vérifier les informations importantes. Voir les préférences en matière de cookies.
+

@@ -1,3 +1,5 @@
 from django.shortcuts import render
+from datetime import datetime
 
-# Create your views here.
+def home(request):
+    return render(request, 'secretbox/secretbox_page.html', {'current_year': datetime.now().year})
