@@ -1,0 +1,4 @@
+<div class="flex mb-4 items-center place-content-center">
+    <img class="h-21 w-auto mr-4" src="{{ logo_url }}" alt="App logo">
+    <h1 class="text-4xl font-bold">{{ title }}</h1>
+</div>

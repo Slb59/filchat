@@ -1,9 +1,11 @@
 <header class="bg-white shadow-sm">
     <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <!-- Logo -->
-        <a href="{% url 'secretbox:home' %}" class="text-xl font-bold">SecretBox</a>
 
         <!-- Navigation -->
+        {% include 'navbar/navbarg.html' %}
+        {% include 'navbar/navbard.html' %}
 
     </div>
 </header>
+
+

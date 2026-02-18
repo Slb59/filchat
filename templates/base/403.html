@@ -1,0 +1,7 @@
+# templates/base/403.html
+{% extends "base.html" %}
+{% block title %}Forbidden (403){% endblock %}
+{% block page_content %}
+<h1>Forbidden (403)</h1>
+<p>{% if exception %}{{ exception }}{% else %}Vous n'êtes pas autotisé à accéder à cette page.{% endif %}</p>
+{% endblock page_content %}

@@ -4,6 +4,7 @@ pdfs = [
     'media/input/fic1.pdf',
     'media/input/fic2.pdf',
     'media/input/fic3.pdf',
+    'media/input/fic4.pdf',
     ]
 
 
