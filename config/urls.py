@@ -17,6 +17,10 @@ from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+handler403 = "secretbox.views.custom_403_view"
+handler404 = "secretbox.views.custom_404_view"
+handler500 = "secretbox.views.custom_500_view"
+
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),

@@ -3,6 +3,8 @@ from .base import *
 
 DEBUG = False
 
+ENVIRONMENT = "prod"
+
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 DATABASES = {

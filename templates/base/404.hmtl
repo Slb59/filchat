@@ -1,5 +1,5 @@
-#templates/base/404.html
 {% extends "base.html" %} 
+{% load wagtailcore_tags static %}
 {% block title %}Page non trouvée{% endblock %}  
 {% block page_content %}
 <h1>Page not found</h1>  
