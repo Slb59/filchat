@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+uv run python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"

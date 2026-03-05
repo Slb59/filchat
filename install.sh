@@ -2,10 +2,10 @@
 set -e
 
 APP_PORT="9000"
-APP_NAME="filchat"
+APP_NAME="secretbox"
 APP_USER="root"
-APP_BASE="/opt/filchat"
-DATA_DIR="$APP_BASE/data/prod"
+APP_BASE="/opt/secretbox"
+DATA_DIR="/var/lib/secretbox"
 APP_DIR="$APP_BASE/app"
 VENV_DIR="$APP_DIR/.venv"
 echo "▶ Installation de $APP_NAME"
@@ -27,11 +27,22 @@ command -v python3 >/dev/null || {
 # 2. Dépendances système
 # -------------------------
 echo "▶ Installation des dépendances système"
-pacman -Sy --noconfirm \
-  python \
-  python-virtualenv \
-  base-devel \
-  curl
+if command -v pacman >/dev/null 2>&1; then
+  # sudo pacman -Sy --noconfirm python python-virtualenv base-devel curl
+  echo "le jeu pacman doit être desactivé!"
+
+elif command -v apt >/dev/null 2>&1; then
+  sudo apt update
+  sudo apt install -y python3 python3-venv build-essential curl
+
+elif command -v dnf >/dev/null 2>&1; then
+  sudo dnf install -y python3 python3-virtualenv @development-tools curl
+
+else
+  echo "Gestionnaire de paquets non supporté"
+  exit 1
+fi
+
 
 # -------------------------
 # 3. Utilisateur système
@@ -58,10 +69,12 @@ fi
 # -------------------------
 echo "▶ Copie du projet"
 # rsync -av --delete --exclude-from='.installignore' ./ "$APP_DIR/"
+BASE_NAME="${DATA_DIR}/db.sqlite3"
+cp "${BASE_NAME}" "${BASE_NAME}.${VERSION}.back"
 VERSION="$(tr -d '[:space:]' < VERSION)"
 ARCHIVE_NAME="${APP_NAME}-${VERSION}.7z"
-echo "▶ Archive : $ARCHIVE_NAME"
-sudo 7z x "$ARCHIVE_NAME" -o"$APP_DIR" -y
+echo "▶ Extraction de l'archive"
+sudo 7z x "app.7z" -o"$APP_DIR" -y
 
 # -------------------------
 # 6. Environnement Python
@@ -82,27 +95,49 @@ echo "▶ Installation des dépendances Python"
 uv sync --refresh
 
 # -------------------------
-# 7. Base de données
+# 7. Variables d'environnement
+# -------------------------
+echo "▶ Création du .env"
+if [ ! -f "$DATA_DIR/.env" ]; then
+    echo "Création du .env production"
+    NEWKEY=$("./djangokey.sh")
+    cat > "$DATA_DIR/.env" <<EOF
+DEBUG=False
+ALLOWED_HOSTS=127.0.0.1,localhost
+DJANGO_SECRET_KEY=$NEWKEY
+DATABASE_URL=sqlite:////$DATA_DIR/db.sqlite3
+WAGTAIL_SITE_NAME=SecretBox
+EOF
+  chown "$APP_USER:$APP_USER" "$DATA_DIR/.env"
+  chmod 600 "$DATA_DIR/.env"
+fi
+
+# -------------------------
+# 8. Base de données
 # -------------------------
 echo "▶ Migrations Django"
 export DJANGO_SETTINGS_MODULE=config.settings.prod
-python manage.py migrate --noinput
+uv run manage.py migrate --noinput
+uv run manage.py tailwind build
+uv run manage.py collectstatic --noinput
 
 # -------------------------
-# 8. Service systemd
+# 9. Service systemd
 # -------------------------
 echo "▶ Installation du service systemd"
 
-cat > /etc/systemd/system/filchat.service <<EOF
+cat > /etc/systemd/system/secretbox.service <<EOF
 [Unit]
-Description=FilChat (Django)
+Description=SecretBox (Django)
 After=network.target
 
 [Service]
 User=$APP_USER
 WorkingDirectory=$APP_DIR
-ExecStart=$VENV_DIR/bin/python manage.py runserver 127.0.0.1:$APP_PORT
+ExecStart=$VENV_DIR/bin/gunicorn --bind 127.0.0.1:9000 config.wsgi:secretbox
 Restart=always
+EnvironmentFile=$DATA_DIR/.env
+Environment=ENV_FILE=$DATA_DIR/.env
 Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
 
 [Install]
@@ -110,12 +145,12 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable filchat
-systemctl restart filchat
-systemctl status filchat
+systemctl enable secretbox
+systemctl restart secretbox
+systemctl status secretbox
 
 # -------------------------
-# 9. Fin
+# 10. Fin
 # -------------------------
 echo
 echo "✅ FilChat est installé et démarré"

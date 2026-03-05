@@ -24,3 +24,6 @@ dist/
 # Fichiers de débogage
 filchat_debug.log
 build.log
+
+# Fichiers de données
+db.sqlite3

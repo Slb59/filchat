@@ -56,14 +56,14 @@ uv run gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 
 ## creation du fichier zip
 ./build.sh
-copy the /build files in an installation directory and lunch the install.sh script
-installation directory could be secretbox in journalling for exemple
+utilise le fichier 7z de /build pour télécharger dans le dossier d'installation et lance le script install.sh
+Le répertoire d'installation pourrait être secretbox dans journalling par exemple
 
 ## creation de l'executable
 
 ### installation sous /opt/filchat
 sudo ./install.sh
-This file install a service in the systeme so that the application can be accessed from the web.
+Ce fichier installe un service sur un système linux pour que l'application puisse être accédée depuis le web.
 
 ### compte system dédie
 sudo useradd -r -s /usr/sbin/nologin filchat
@@ -71,14 +71,6 @@ sudo chown -R filchat:filchat /opt/filchat
 
 ### pour un service global (multi user)
 copier ficlchat.service dans /etc/systemd/system
-
-### activation
-sudo systemctl daemon-reload
-sudo systemctl enable filchat
-sudo systemctl restart filchat
-
-### à faire uniquement à l'installation
-sudo -u filchat /opt/filchat/app/.venv/bin/python manage.py migrate
 
 ### test après installation
 systemctl status filchat

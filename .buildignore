@@ -6,7 +6,9 @@ tests/
 .gitignore
 makefile
 .installignore
-data/
+db.sqlite3
 build.sh
 install.sh
 versions/
+media/input/
+media/output/

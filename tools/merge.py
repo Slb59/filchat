@@ -1,19 +1,24 @@
 import os
 from pypdf import PdfWriter, PdfReader
 
-def merge(pwd):
-    pdfs = [
-        'media/input/fic1.pdf',
-        'media/input/fic2.pdf',
-        'media/input/fic3.pdf',
-        'media/input/fic4.pdf',
-        ]
+def merge(pwd, indirname):
+    # pdfs = [
+    #     'media/input/fic1.pdf',
+    #     'media/input/fic2.pdf',
+    #     'media/input/fic3.pdf',
+    #     'media/input/fic4.pdf',
+    #     'media/input/fic5.pdf',
+    #     ]
 
 
     merger = PdfWriter()
 
-    for pdf in pdfs:
-        merger.append(pdf)
+    # for pdf in pdfs:
+    #     merger.append(pdf)
+    
+    for filename in os.listdir(indirname):
+        if filename.endswith(".pdf"):
+            merger.append(indirname + filename)
 
     output_filename = "media/output/merged.pdf"
 
@@ -31,7 +36,7 @@ def merge(pwd):
 
 def crypt(pwd,indirname):
     
-    outdirname =  indirname + "output2/"
+    outdirname =  "./media/output/"
     ficnum = 1
     for filename in os.listdir(indirname):
         if filename.endswith(".pdf"):
@@ -41,8 +46,9 @@ def crypt(pwd,indirname):
             encrypt_filename = f"{outdirname}{ficnum:02}.pdf"
             ficnum += 1
             writer.write(encrypt_filename)
+    
 
 if __name__ == "__main__":
-    # merge('12345')
-    indirname = "/home/"
+    indirname = "./media/input/"
+    # merge('12345', indirname)
     crypt('12345',indirname)

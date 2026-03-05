@@ -1,3 +1,5 @@
+- 0..1.2 : Revue du front Django
+
 - 0.1.1 : revue de la procédure de déploiement
 20260127: dissocier les settings de prod et dev
 20260128: déploiement depuis une archive
