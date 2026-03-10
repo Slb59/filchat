@@ -1,10 +1,35 @@
+{% load wagtailcore_tags %}
+
 <footer class="bg-gray-800 text-white py-6 container-fluid text-center mt-auto p-5 rounded">
     <hr>
-    <div class="container mx-auto px-4 text-center" style="background-color: rgb(34, 31, 31);">
+    <div class="container mx-auto px-4 text-center" style="background-color: rgb(34, 31, 31);">      
+
+        {% with linkedin_url=settings.base.NavigationSettings.linkedin_url github_url=settings.base.NavigationSettings.github_url mastodon_url=settings.base.NavigationSettings.mastodon_url %}
+            {% if linkedin_url or github_url or mastodon_url %}
+            <p>
+                Follow me on:
+                {% if github_url %}
+                <a href="{{ github_url }}">GitHub</a>
+                {% endif %}
+                {% if linkedin_url %}
+                <a href="{{ linkedin_url }}">LinkedIn</a>
+                {% endif %}
+                {% if mastodon_url %}
+                <a href="{{ mastodon_url }}">Mastodon</a>
+                {% endif %}
+            </p>
+            {% endif %}
+        {% endwith %}
+
+        
+        {# Add footer_text: #}
+        {% get_footer_text %}
+        
         <p>&copy; {{ current_year }}-Osynia SecretBox. Tous droits réservés.
         {% if request.user.is_superuser %}
-        -
         <a href="{% url 'admin:index' %}">Administration avancée</a>
-        {% endif %}</p>
+        {% endif %}
+        </p>
+
     </div>
 </footer>

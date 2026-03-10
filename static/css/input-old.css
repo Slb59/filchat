@@ -1,0 +1,281 @@
+/* @tailwind directives */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+    --color-black: #221f1f;
+    --color-gray: #9ca3af;
+    --color-grey: #7c9786;
+    --color-brown: #b36739;
+    --color-darkbrown: #4f1b11;
+    --color-bleup : #2A3D66;
+    --color-or: #FFD700;
+    --color-violet: #8A2BE2;
+    --color-vert: #2E8B57;
+    --color-taupe: #d7d4d0;
+    --color-white: #ecddd5;
+    --color-verybrown: #3a2412;    
+}
+
+@font-face {
+    font-family: 'Cinzel';
+    src: url("/static/font/Cinzel.ttf");
+}
+
+@layer base {
+    :root {
+        --footer-h: 3rem;
+    }
+    html,
+    body {
+        height: 100%;
+    }
+}
+
+@layer utilities {
+    .bg-taupe {
+        background-color: var(--color-taupe);
+    }
+
+    .bg-darkbrown {
+        background-color: var(--color-darkbrown);
+    }
+
+    .bg-gray {
+        background-color: var(--color-gray);
+    }
+
+    .bg-bleup {
+        background-color: var(--color-bleup);
+    }
+
+    .text-black {
+        color: var(--color-black);
+    }
+
+    .text-white {
+        color: var(--color-white);
+    }
+}
+
+@layer components {
+
+    .container {
+        @apply max-w-full mx-auto p-2 sm:p-4 lg:p-6;
+    }
+
+    .title-container {
+        @apply w-full overflow-x-auto;
+    }
+
+    .contact-link {
+        @apply no-underline text-inherit transition duration-300;
+    }
+
+    .contact-link:hover {
+        text-decoration: underline;
+        text-decoration-color: rgb(var(--color-brown-rgb));
+    }
+
+    .flex-container {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .icon {
+        @apply w-5 h-5 mr-2;
+    }
+
+    .entry-item {
+        @apply mb-5 p-4 border border-gray-300 rounded bg-gray-50;
+    }
+
+    .entry-date {
+        @apply text-brown font-bold text-lg mb-2;
+    }
+
+    .entry-content {
+        @apply mt-2 text-gray-800;
+    }
+
+    .round-icon {
+        @apply w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center hover:bg-gray-500;
+    }
+
+    .round-hicon {
+        @apply w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-500;
+    }
+
+    button.round-hicon {
+        @apply bg-transparent border-none p-0;
+    }
+
+    .button-valider {
+        @apply mt-4 font-medium rounded px-5 py-2.5 text-sm bg-brown text-white hover:bg-darkbrown focus:ring-4 focus:ring-or;
+    }
+
+    a.little-round-hicon {
+        @apply w-15 h-15 rounded-full flex items-center justify-center transition-colors hover:bg-gray-500;
+    }
+
+    .name-text {
+        @apply flex-1 no-underline text-inherit;
+    }
+    
+    a.name-text:hover {
+        @apply underline;
+        color: #2A3D66;
+    }
+
+    .body-screen {
+        @apply flex flex-col min-h-screen font-['Cinzel'] bg-gray-100;
+    }
+
+    .main-screen {
+        @apply flex items-start justify-center pt-4 pb-6 bg-taupe w-full;
+    }
+
+    .navbar-left {
+        @apply w-15 p-2 bg-gray-300 space-y-2;
+        color: var(--color-white);
+    }
+
+    .navbar-right {
+        @apply w-15 p-2 space-y-2 bg-gray-300;
+        color: var(--color-white);
+    }
+
+    .app-content {
+        @apply flex flex-col bg-white p-4 overflow-y-auto items-center w-full;
+    }
+
+    .content-block {
+        @apply flex flex-col min-w-full;
+    }
+
+    .footer {
+        @apply w-full text-center fixed bottom-0 left-0 z-10 bg-darkbrown text-white;
+        height: var(--footer-h);
+        line-height: var(--footer-h);
+    }
+
+    .dashboard_content {
+        @apply overflow-x-auto overflow-y-auto h-[600px] overflow-scroll;
+    }
+
+    .table_content {
+        @apply min-w-full border border-gray-300 bg-white; 
+    }
+
+    .tr_header {
+        @apply sticky top-0 bg-brown text-left;
+    }
+
+    .th_header {
+        @apply py-2 px-2 border-b;
+    }
+
+    .td_header {
+        @apply py-2 px-2 border-b;
+    } 
+
+    .button-valider {
+        @apply mt-4 outline-none text-white bg-brown font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:bg-verybrown;
+    }
+    
+    .position-item {
+        @apply mb-1 p-1 border border-white rounded-lg border-b-white;
+    }
+
+    .bg-brown-100 {
+        @apply backdrop-blur-sm;
+        background-color: rgba(var(--color-brown-rgb), 0.5);
+    }
+
+    .img-icon {
+        @apply w-10 h-10;
+    }
+
+    .alert {
+        @apply p-2.5 my-2.5 rounded;
+    }
+
+    .alert-error {
+        @apply bg-red-100 text-red-800;
+    }
+
+    .action-icons {
+        @apply mt-2.5 flex items-center text-gray-800;
+    }
+
+
+    .email-container {
+        @apply max-w-[600px] mx-auto font-sans;
+    }
+
+    .email-header {
+        @apply text-center py-5;
+    }
+
+    .email-body {
+        @apply bg-gray-50 p-5 rounded;
+    }
+
+    .email-button {
+        @apply inline-block bg-blue-700 text-white px-6 py-3 no-underline rounded font-bold;
+    }
+
+    .footer__copyright {
+        @apply absolute left-[10px];
+    }
+
+    .footer__menu {
+        @apply text-center;
+    }
+
+    .escapevault-map {
+        @apply w-4/5 h-full mt-4 justify-center;
+    }
+
+}
+
+.scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.button-valider:focus {
+    box-shadow: 0 0 0 4px #fde047;
+}
+.dark .button-valider:focus {
+    box-shadow: 0 0 0 4px #78350f;
+}
+
+input.editable,
+select.editable,
+textarea.editable {
+    background-color: #e6ffed;
+    border: 2px solid #22c55e;
+    /* vert */
+}
+
+input.readonly,
+textarea.readonly {
+    background-color: #f9fafb;
+    border: 1px dashed #9ca3af;
+    opacity: 0.7;
+}
+
+select.readonly {
+    background-color: #e72828 !important;
+    color: #f00d6f !important;
+    pointer-events: none !important;
+    border: 1px dashed #9ca3af !important;
+    opacity: 0.7 !important;
+}
+

@@ -1,0 +1,2149 @@
+Peux-tu m'aider à utiliser obsidian ?
+Bien sûr ! 😊
+J’adore Obsidian — c’est un outil puissant mais il peut sembler un peu opaque au
+début.
+Pour que je t’aide au mieux, peux-tu me préciser ce que tu veux faire avec Obsidian
+?
+Par exemple :
+1. ️ Organisation — créer une structure claire pour tes notes, tes projets, ton
+journal, etc.
+2. 🧠 Prise de notes — apprendre à utiliser le Markdown, les liens internes, les
+tags, etc.
+3. 🔗 Système de pensée — relier tes idées, faire une “seconde cervelle” façon
+Zettelkasten.
+4. 🧩 Plugins et personnalisation — installer des plugins (Dataview, Calendar,
+Tasks…), des thèmes, ou automatiser des choses.
+5. 📱 Synchronisation et sauvegarde — entre plusieurs appareils (ordi, mobile,
+cloud).
+6. 💬 Cas concret — par exemple : “je veux gérer mes projets Django avec
+Obsidian”, ou “je veux apprendre l’espagnol avec Obsidian”.
+Dis-moi ce que tu veux faire ou ce qui te bloque, et je te guide pas à pas (avec
+exemples concrets et captures mentales si besoin).
+Tu veux qu’on commence par les bases ou par un usage précis que tu as déjà en
+tête ?
+J'ai le dataview suivant:
+dataview
+table
+from "02-Jeux video/Book of hours/boh-202510
+where lock = false
+Je voudrais afficher sur chaque ligne le nom du fichier
+mais aussi le nombre de "books", le nombre de
+"things", le nombre de "workstations".
+ChatGPT Obtenir Plus
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 1/67
+par exemple, pour le fichier "keeper's lodge", la liste
+des "books" s'obtiens:
+dataview
+table read
+from "02-Jeux video/Book of hours/boh-202510
+where location = [[keeper's lodge]]
+la liste des things:
+dataview
+table
+from "02-Jeux video/Book of hours/boh-202510
+where location = [[keeper's lodge]]
+la liste des workstations:
+dataview
+table
+from "02-Jeux video/Book of hours/boh-202510
+where location = [[keeper's lodge]]
+Est-ce possible ?
+Oui ! 🪶 C’est possible avec DataviewJS (la version JavaScript du plugin Dataview), car
+la version simple de Dataview ( table from ... ) ne permet pas de faire des sousrequêtes dynamiques (comme “compter les livres liés à ce fichier”).
+👉 On va donc passer à un bloc dataviewjs , qui permet de faire du code JavaScript
+utilisant les fonctions Dataview.
+Voici le script que tu peux coller dans ton fichier :
+// Dossier de base
+const rooms = dv.pages('"02-Jeux video/Book of hours/boh-202510/rooms"')
+ .where(p => p.lock === false);
+dv.table(
+ ["Room", "Books", "Things", "Workstations"],
+ rooms.map(room => {
+ // nom du fichier (titre ou basename)
+ const roomName = room.file.name;
+ // chemins des autres dossiers
+ const basePath = "02-Jeux video/Book of hours/boh-202510";
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 2/67
+💡 Explications
+dv.pages() récupère les notes d’un dossier.
+.where() filtre selon la propriété location .
+b.location.path === room.file.path permet de comparer le lien interne
+[[keeper's lodge]] à la note correspondante.
+dv.table([...], [...]) construit un tableau avec tes données.
+🧩 Pré-requis
+Assure-toi que :
+Chaque fichier de books , things , workstation contient bien une propriété
+Dataview comme :
+Et que rooms contient une propriété :
+Si tu veux que les nombres soient aussi des liens cliquables (vers les listes
+correspondantes), je peux te montrer une version enrichie avec des liens ou
+infobulles.
+Souhaites-tu que je te la fasse ?
+ // pour chaque type (books, things, workstations)
+ const books = dv.pages(`"${basePath}/books"`).where(b => b.location &&
+ const things = dv.pages(`"${basePath}/things"`).where(b => b.location &
+ const workstations = dv.pages(`"${basePath}/workstation"`).where(b =>
+ return [
+ dv.fileLink(room.file.path), // lien vers la room
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+location: [[keeper's lodge]]
+lock: false
+YAML
+YAML
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 3/67
+C'est parfait, merci beaucoup
+Avec grand plaisir 😄✨
+Je suis ravie que ça marche pour toi — DataviewJS est vraiment magique quand on
+veut croiser des données comme ça dans Obsidian.
+Si tu veux aller plus loin, je peux t’aider à :
+rendre ces nombres cliquables (ouvrent une liste des items correspondants),
+ajouter un total général en bas du tableau,
+ou même afficher un graphique (par ex. nombre de books/things/workstations
+par room avec Chart.js ou Mermaid).
+Souhaites-tu que je te montre l’une de ces variantes ?
+Dans obsidian, je cherche à remplacer ce dataview:
+dataview
+table language, edge, forge, grail, heart, k
+from "02-Jeux video/Book of hours/boh-202510
+where read = True
+de sorte que les elements edge, forge, grail, heart,
+knock, lantern, moon, moth, nectar, rose, sky, winter
+soient remplacés par une seule colonne qui comprends
+le nom de l'aspect si celui-ci est positif.
+Excellente question 🔮
+Oui — tu peux faire ça !
+Tu veux donc une seule colonne (par exemple nommée Aspects ) qui contienne la
+liste des aspects présents pour chaque livre (lorsque leur valeur est positive), au
+lieu d’avoir une colonne par aspect.
+👉 Pour cela, il faut passer en DataviewJS, car la version normale ( dataview ) ne
+peut pas filtrer dynamiquement les champs.
+Voici le code complet que tu peux coller :
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 4/67
+🧠 Ce que fait ce script :
+Il récupère toutes les notes de books où read = true .
+Il parcourt la liste des aspects et garde seulement ceux dont la valeur est
+positive ( > 0 ).
+Il formate la colonne “Aspects” comme une chaîne du type :
+Il garde les autres colonnes utiles ( language , location ).
+🪄 Exemple de rendu
+Book Language Aspects Location
+Keeper’s Compendium Latin Edge, Grail [[Keeper’s Lodge]]
+// Liste des aspects à vérifier
+const aspects = [
+ "edge", "forge", "grail", "heart", "knock", "lantern",
+ "moon", "moth", "nectar", "rose", "sky", "winter"
+];
+// Récupère les livres lus
+const books = dv.pages('"02-Jeux video/Book of hours/boh-202510/books"')
+ .where(p => p.read === true);
+// Affiche le tableau
+dv.table(
+ ["Book", "Language", "Aspects", "Location"],
+ books.map(b => {
+ // Sélectionne les aspects positifs (valeur > 0 ou true)
+ const positiveAspects = aspects
+ .filter(a => b[a] && b[a] > 0)
+ .map(a => a.charAt(0).toUpperCase() + a.slice(1)); // Majuscule init
+ return [
+ dv.fileLink(b.file.path),
+ b.language ?? "",
+ positiveAspects.join(", "),
+ b.location ? dv.fileLink(b.location.path) : ""
+ ];
+ })
+);
+Edge, Lantern, Moon
+dataviewjs
+Code
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 5/67
+Book Language Aspects Location
+Flames of Knowledge Greek Forge, Lantern, Heart [[Scriptorium]]
+Souhaites-tu que je t’ajoute aussi une petite icône ou couleur pour chaque aspect
+(par exemple 🔥 pour Forge, 🌙 pour Moon, etc.) ?
+Ça rend souvent le tableau plus lisible visuellement.
+est-ce que je peux ordonner le resultat par
+positiveAspects.join(", ") ?
+Très bonne idée 💡
+Oui, tu peux trier les résultats par la chaîne résultante de positiveAspects.join(",
+") — c’est tout à fait possible en DataviewJS.
+Il suffit d’ajouter un petit tri JavaScript avant d’afficher le tableau.
+Voici la version complète avec le tri inclus 👇
+// Liste des aspects à vérifier
+const aspects = [
+ "edge", "forge", "grail", "heart", "knock", "lantern",
+ "moon", "moth", "nectar", "rose", "sky", "winter"
+];
+// Récupère les livres lus
+let books = dv.pages('"02-Jeux video/Book of hours/boh-202510/books"')
+ .where(p => p.read === true)
+ .array(); // on convertit en tableau pour pouvoir trier facilement
+// Trie les livres par liste d’aspects positifs (ordre alphabétique)
+books.sort((a, b) => {
+ const aspectsA = aspects.filter(x => a[x] && a[x] > 0).join(", ");
+ const aspectsB = aspects.filter(x => b[x] && b[x] > 0).join(", ");
+ return aspectsA.localeCompare(aspectsB);
+});
+// Affiche le tableau
+dv.table(
+ ["Book", "Language", "Aspects", "Location"],
+ books.map(b => {
+ const positiveAspects = aspects
+ .filter(a => b[a] && b[a] > 0)
+ .map(a => a.charAt(0).toUpperCase() + a.slice(1));
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 6/67
+🔍 Explications :
+.array() transforme la collection Dataview en tableau JS ordinaire.
+.sort() permet de trier selon une clé personnalisée (ici la chaîne jointe des
+aspects positifs).
+localeCompare() fait un tri alphabétique respectueux des accents.
+Si tu veux, on peut aussi :
+trier par nombre d’aspects (du plus riche au plus pauvre en vertus 😄),
+ou par un aspect spécifique (ex. tous les livres avec “Lantern” en premier).
+Souhaites-tu que je te montre l’une de ces variantes ?
+ return [
+ dv.fileLink(b.file.path),
+ b.language ?? "",
+ positiveAspects.join(", "),
+ b.location ? dv.fileLink(b.location.path) : ""
+ ];
+ })
+);
+ma clause where n'est pas correcte : const skills =
+dv.pages('"02-Jeux video/Book of hours/boh202510/subjects"')
+where(p => p.contains(tree,[[Illumination]])).array();.
+Comment la corriger ?
+Excellent réflexe de vouloir filtrer ainsi 🌿 — mais effectivement ta clause
+where(...) n’est pas correcte pour DataviewJS.
+Voici pourquoi :
+Dans DataviewJS, la méthode dv.pages() retourne une collection Dataview, et
+pour la filtrer tu dois utiliser .where(p => …) avec une fonction JavaScript valide.
+Mais p.contains(tree, [[Illumination]]) n’est pas une syntaxe valide —
+contains() n’est pas une fonction de DataviewJS ici.
+👉 Il faut utiliser les méthodes et opérateurs JavaScript standards.
+La bonne forme dépend du type de ton champ tree dans tes fichiers de “subjects”.
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 7/67
+🧩 Cas 1 : ton champ tree est une liste YAML
+Par exemple :
+Alors ton code doit être :
+💡 Ici :
+p.tree est un tableau de liens.
+t.path est le chemin complet de la note liée.
+some(...) vérifie si un élément du tableau correspond à Illumination.
+🧩 Cas 2 : ton champ tree contient une seule valeur lien
+Par exemple :
+Alors :
+🧠 Variante plus lisible (si tu veux comparer par nom de fichier plutôt
+que par chemin complet) :
+tree:
+ - [[Illumination]]
+ - [[Alchemy]]
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjects"
+ .where(p => p.tree && p.tree.some(t => t.path === "02-Jeux video/Book of
+ .array();
+tree: [[Illumination]]
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjects"
+ .where(p => p.tree && p.tree.path === "02-Jeux video/Book of hours/boh-2
+ .array();
+YAML
+dataviewjs
+YAML
+dataviewjs
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 8/67
+✅ Cela fonctionne même si tree est une liste ou un seul lien,
+et compare par nom de fichier ( Illumination ) au lieu du chemin complet.
+Souhaites-tu que je t’aide à adapter la clause si ton champ tree contient du texte
+brut (et pas de lien [[...]] ) ?
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjects"
+ .where(p => {
+ if (!p.tree) return false;
+ const links = Array.isArray(p.tree) ? p.tree : [p.tree];
+ return links.some(l => l.file.name === "Illumination");
+ })
+ .array();
+mon champs est une prorite liste dans mon fichier
+obsidian contenant par exemple [[Illumination]]
+Parfait 🌟 — donc ton champ YAML est bien une liste de liens internes :
+Dans ce cas, ta clause where doit traiter tree comme un tableau de liens
+Dataview, et vérifier si l’un d’eux pointe vers la note Illumination .
+Voici la bonne syntaxe DataviewJS 👇
+tree:
+ - [[Illumination]]
+ - [[Alchemy]]
+ - [[Botany]]
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjects"
+ .where(p =>
+ p.tree &&
+ p.tree.some(t => t.path === "02-Jeux video/Book of hours/boh-202510/su
+ )
+ .array();
+dv.table(["File", "Tree"], skills.map(s => [dv.fileLink(s.file.path), s.tr
+YAML
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 9/67
+💡 Explications :
+p.tree → ton champ YAML, une liste de liens.
+.some() → vérifie si au moins un lien dans tree correspond à la note
+Illumination .
+t.path → le chemin complet de la note liée (utile si plusieurs notes peuvent
+avoir le même nom).
+🧠 Variante plus souple : comparaison par nom de note (au lieu du
+chemin complet)
+Si tu préfères ne pas écrire le chemin complet (et que les noms de fichiers sont
+uniques) :
+✅ Cette version fonctionne même si tree: contient une seule entrée (sans tiret - )
+et évite les chemins longs : tu filtres juste sur file.name === "Illumination" .
+Souhaites-tu que je t’aide à rendre cette comparaison paramétrable, par exemple
+pour afficher toutes les pages ayant tree qui contient la note actuelle
+( this.file.name ou this.file.path ) ?
+C’est pratique quand tu veux l’utiliser depuis différentes notes.
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjects"
+ .where(p => {
+ if (!p.tree) return false;
+ const links = Array.isArray(p.tree) ? p.tree : [p.tree];
+ return links.some(l => l.file.name === "Illumination");
+ })
+ .array();
+dv.table(["File", "Tree"], skills.map(s => [dv.fileLink(s.file.path), s.tr
+J'obtiens aucun resultat alors qu'au moins une réponse
+correspond.
+Parfait, on va déboguer ça ensemble pas à pas 🔍
+Tu as donc :
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 10/67
+un champ YAML du type
+et tu veux récupérer toutes les notes dont la liste tree contient le lien vers la
+note Illumination .
+🧩 Étape 1 : Vérifions la structure réelle de p.tree
+Les liens Obsidian sont souvent représentés comme des objets Dataview contenant
+les propriétés suivantes :
+path → chemin complet du fichier cible
+file.name → nom du fichier cible
+display → texte affiché (facultatif)
+👉 On peut le vérifier facilement :
+➡️ Regarde dans la sortie du panneau Dataview, et copie-moi ce que tu vois pour
+p.tree (juste un exemple).
+Cela nous dira s’il s’agit d’un tableau d’objets { path: ..., file: ... } ou juste de
+chaînes [[Illumination]] .
+🧠 Étape 2 : les 3 variantes selon le format
+1. Si c’est un tableau d’objets comme :
+tree:
+ - [[Illumination]]
+ - [[Alchemy]]
+for (let p of dv.pages('"02-Jeux video/Book of hours/boh-202510/subjects"'
+ if (p.tree) {
+ dv.paragraph(`File: ${p.file.name}`);
+ dv.paragraph(JSON.stringify(p.tree, null, 2));
+ }
+}
+[
+ { "path": "02-Jeux video/Book of hours/boh-202510/subjects/Illuminati
+ { "path": "02-Jeux video/Book of hours/boh-202510/subjects/Alchemy.md
+]
+YAML
+dataviewjs
+JSON
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 11/67
+👉 alors le bon code est :
+2. Si c’est un tableau de chaînes comme :
+👉 alors :
+3. Si c’est un tableau mixte (liens + chaînes) :
+(cela arrive selon la version de Dataview ou la façon dont le YAML est écrit)
+👉 tu peux rendre le filtre plus robuste :
+Une fois que tu m’auras montré le résultat de la première étape
+( JSON.stringify(p.tree) ),
+je pourrai te dire exactement quelle version coller pour que ça marche parfaitement
+dans ton vault.
+Tu veux bien me copier un exemple du résultat ?
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjec
+ .where(p => p.tree && p.tree.some(t => t.path && t.path.endsWith("Ill
+ .array();
+["[[Illumination]]", "[[Alchemy]]"]
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjec
+ .where(p => p.tree && p.tree.some(t => typeof t === "string" && t.inc
+ .array();
+const skills = dv.pages('"02-Jeux video/Book of hours/boh-202510/subjec
+ .where(p => {
+ if (!p.tree) return false;
+ const links = Array.isArray(p.tree) ? p.tree : [p.tree];
+ return links.some(l =>
+ (typeof l === "string" && l.includes("Illumination")) ||
+ (l.path && l.path.endsWith("Illumination.md")) ||
+ (l.file && l.file.name === "Illumination")
+ );
+ })
+ .array();
+dv.table(["File", "Tree"], skills.map(s => [dv.fileLink(s.file.path), s
+dataviewjs
+JSON
+dataviewjs
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 12/67
+Comment accéder aux fichiers ods dans l'explorateur
+d'obsidian ?
+Très bonne question 🌿
+👉 Par défaut, Obsidian n’affiche pas les fichiers .ods (fichiers LibreOffice Calc)
+dans l’explorateur — parce qu’il ne reconnaît que certains types de fichiers “textuels”
+(comme .md , .txt , .pdf , .png , .jpg , etc.).
+Mais il existe plusieurs solutions selon ce que tu veux faire :
+🧩 1. Voir les fichiers .ods dans l’explorateur
+Tu peux forcer Obsidian à les afficher en modifiant la configuration dans ton vault :
+Étapes :
+1. Ouvre le panneau de configuration → ⚙️ Paramètres.
+2. Va dans Fichiers et liens → section Types de fichiers cachés (Excluded file types).
+3. Vérifie si .ods est listé.
+S’il y est → supprime-le de la liste.
+4. Ensuite, ferme et rouvre Obsidian.
+✅ Ton fichier .ods apparaîtra alors dans le panneau de gauche (Explorateur de
+fichiers), au bon emplacement du vault.
+🪶 2. Ouvrir le fichier .ods depuis Obsidian
+Même si tu le vois, Obsidian ne peut pas l’ouvrir directement dans une note (ce
+n’est pas un format qu’il sait afficher).
+Mais tu peux :
+Cliquer dessus → il s’ouvrira avec LibreOffice Calc (ou ton tableur par défaut).
+Ou insérer un lien cliquable vers lui dans une note :
+(le fichier doit être dans le même dossier ou un sous-dossier du vault)
+[Ouvrir le tableau des livres](book-data.ods)
+Markdown
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 13/67
+⚙️ 3. (Optionnel) Activer un plugin communautaire
+Si tu veux aller plus loin (par ex. afficher des extraits de ton .ods dans une note), il
+existe des plugins communautaires comme :
+Advanced Tables, Excel Viewer, ou Obsidian Leaflet + dataviewjs (pour
+extraire des données CSV/ODS).
+Mais attention, la plupart lisent plus facilement le CSV.
+Tu peux donc enregistrer ton .ods en .csv (dans LibreOffice : Fichier → Enregistrer
+sous → CSV), et là Dataview saura le lire facilement.
+🚀 Astuce pratique
+Tu peux automatiser ce passage .ods → .csv (avec un petit script Python ou bash),
+et ensuite utiliser Dataview comme ceci :
+Souhaites-tu que je te montre comment afficher un tableau .ods (ou .csv ) dans
+une note Obsidian directement ?
+table col1, col2
+from "data"
+where file.name = "book-data.csv"
+Dans ce code:
+dataviewjs
+// Dossier de base
+const rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false);
+dv.table(
+ ["Room", "Period", "Books", "Things", "Wor
+ rooms.map(room => {
+ // nom du fichier (titre ou basename)
+ const roomName = room.file.name;
+ const period = room.file.season
+ // pour chaque type (books, things, work
+ const books = dv.pages(`"books"`).where(
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 14/67
+ const things = dv.pages(`"things"`).wher
+ const workstations = dv.pages(`"workstat
+ return [
+ dv.fileLink(room.file.path), // lien
+ period,
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+Je souhaite récupérer la propriété "period"
+Très bonne question 🌿 et ton code est presque parfait — il ne te manque qu’un
+petit détail subtil dans l’accès à la propriété period .
+👉 En fait, tu écris actuellement :
+Mais dans Dataview, les métadonnées YAML d’un fichier (comme period , season ,
+lock , etc.) sont accessibles directement via l’objet room , et pas à l’intérieur de
+room.file .
+✅ La bonne ligne est donc :
+Voici ton code corrigé complet 👇
+const period = room.file.season
+const period = room.period;
+// Dossier de base
+const rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false);
+dv.table(
+ ["Room", "Period", "Books", "Things", "Workstations"],
+ rooms.map(room => {
+JavaScript
+JavaScript
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 15/67
+💡 En résumé :
+room.file → contient uniquement les informations système du fichier (nom,
+chemin, liens internes, etc.).
+room.period → contient ta propriété YAML définie dans la note :
+D’où la différence entre room.file.name ✅ et room.file.period ❌.
+Si tu veux être sûr que Dataview “voit” bien ta propriété period , tu peux vérifier avec
+:
+Souhaites-tu que je te montre comment ordonner le tableau par period
+(printemps, été, automne, hiver) dans ce code ?
+ // nom du fichier (titre ou basename)
+ const roomName = room.file.name;
+ const period = room.period; // ✅ correction ici
+ // pour chaque type (books, things, workstations)
+ const books = dv.pages('"books"').where(b => b.location && b.location.
+ const things = dv.pages('"things"').where(b => b.location && b.locatio
+ const workstations = dv.pages('"workstation"').where(b => b.location &&
+ return [
+ dv.fileLink(room.file.path), // lien vers la room
+ period,
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+period: Spring
+lock: false
+table period
+from "rooms"
+comment trier le résultat sur la base de cette colonne ?
+YAML
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 16/67
+Excellent réflexe 🌟
+Trier le résultat dans un script DataviewJS est très simple — il suffit de trier ton
+tableau rooms avant l’affichage.
+Voici la version complète de ton script avec tri sur period 👇
+✅ Version simple : tri alphabétique sur period
+👉 Ici, localeCompare trie les saisons par ordre alphabétique :
+Autumn, Spring, Summer, Winter .
+🍃 Version personnalisée : tri par ordre saisonnier
+Si tu veux un ordre logique (par exemple : Spring → Summer → Autumn → Winter),
+tu peux définir l’ordre manuellement avec une petite table de correspondance :
+// Dossier de base
+let rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false)
+ .array(); // on le convertit en tableau JS pour pouvoir trier
+// Tri alphabétique sur la propriété "period"
+rooms.sort((a, b) => (a.period ?? "").localeCompare(b.period ?? ""));
+dv.table(
+ ["Room", "Period", "Books", "Things", "Workstations"],
+ rooms.map(room => {
+ const books = dv.pages('"books"').where(b => b.location && b.location.
+ const things = dv.pages('"things"').where(b => b.location && b.locatio
+ const workstations = dv.pages('"workstation"').where(b => b.location &&
+ return [
+ dv.fileLink(room.file.path),
+ room.period,
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+let rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false)
+dataviewjs
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 17/67
+✅ Si une note n’a pas de period , elle apparaîtra en premier (ou tu peux gérer ce cas
+avec ?? "Unknown" ).
+Souhaites-tu que je t’ajoute un séparateur visuel par saison (par exemple un entête “🌸 Spring”, “☀️ Summer”, etc.) dans le tableau ?
+C’est possible aussi avec dv.header() ou un regroupement automatique.
+ .array();
+// Ordre personnalisé
+const order = ["Spring", "Summer", "Autumn", "Winter"];
+rooms.sort((a, b) => order.indexOf(a.period) - order.indexOf(b.period));
+dv.table(
+ ["Room", "Period", "Books", "Things", "Workstations"],
+ rooms.map(room => {
+ const books = dv.pages('"books"').where(b => b.location && b.location.
+ const things = dv.pages('"things"').where(b => b.location && b.locatio
+ const workstations = dv.pages('"workstation"').where(b => b.location &&
+ return [
+ dv.fileLink(room.file.path),
+ room.period,
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+voici mon nouveau code:
+dataviewjs
+// Dossier de base
+const rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false)
+ .array();
+const order = ["dawn", "solar", "baronial",
+rooms.sort((a, b) => order.indexOf(a.period)
+dv.table(
+ ["Room", "Period", "Books", "Things", "Wor
+ rooms.map(room => {
+ // nom du fichier (titre ou basename)
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 18/67
+ const roomName = room.file.name;
+ const period = room.period;
+ // pour chaque type (books, things, work
+ const books = dv.pages(`"books"`).where(
+ const things = dv.pages(`"things"`).wher
+ const workstations = dv.pages(`"workstat
+ return [
+ dv.fileLink(room.file.path), // lien
+ period,
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+Le tri ne fonctionne pas. A noter que parfoi
+Réflexion durant 9s
+Bonne piste — ton code est très proche du but. Le problème vient très probablement
+de la forme des valeurs period (majuscules/minuscules, espaces, ou même
+undefined / tableau) et de la façon dont on calcule l'index dans l'ordre.
+Aussi, il faut s'assurer d'appeler .array() (tu l'as fait — bravo) : sans ça .sort()
+ne fonctionne pas comme attendu.
+Je te propose une version robuste qui :
+normalise les valeurs ( toString().toLowerCase().trim() ),
+gère les cas où period est undefined ou un tableau,
+place explicitement les éléments sans period en premier,
+puis fait le tri selon ton ordre personnalisé.
+Colle ceci dans ton bloc dataviewjs :
+// Dossier de base (on convertit en tableau JS pour trier)
+let rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false)
+ .array();
+// Ordre désiré (en minuscules pour la normalisation)
+const order = ["dawn", "solar", "baronial", "curia", "nocturnal"];
+// Map pour accès rapide
+const orderMap = Object.fromEntries(order.map((v, i) => [v, i]));
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 19/67
+// helper pour normaliser la valeur period (gère string, lien, tableau, un
+function normalizePeriod(val) {
+ if (val === undefined || val === null) return "";
+ // si c'est un tableau, on prend le premier élément représentatif
+ if (Array.isArray(val) && val.length > 0) val = val[0];
+ // si c'est un objet lien Dataview (ex : {file: {name: "dawn"}, path: ..
+ if (typeof val === "object") {
+ if (val.file && val.file.name) return String(val.file.name).toLowerCas
+ if (val.path) {
+ // extrait le nom de fichier depuis le path (dernier segment)
+ const parts = String(val.path).split("/");
+ const last = parts[parts.length - 1];
+ return String(last.replace(/\.md$/i, "")).toLowerCase().trim();
+ }
+ return String(val).toLowerCase().trim();
+ }
+ // sinon string/number -> toString
+ return String(val).toLowerCase().trim();
+}
+// Comparator qui place les éléments sans period (chaine vide) en premier
+rooms.sort((a, b) => {
+ const pa = normalizePeriod(a.period);
+ const pb = normalizePeriod(b.period);
+ // cas où aucun des deux n'a de period : garder l'ordre initial (stable)
+ const emptyA = pa === "";
+ const emptyB = pb === "";
+ if (emptyA && !emptyB) return -1; // a avant b
+ if (!emptyA && emptyB) return 1; // b avant a
+ // index dans la map (si absent => -1)
+ const ia = orderMap.hasOwnProperty(pa) ? orderMap[pa] : -1;
+ const ib = orderMap.hasOwnProperty(pb) ? orderMap[pb] : -1;
+ // Si les deux ont index -1 (valeurs inconnues) on tombe back sur compar
+ if (ia === -1 && ib === -1) return pa.localeCompare(pb);
+ // sinon on trie selon index (-1 fait apparaître en premier car plus pet
+ return ia - ib;
+});
+dv.table(
+ ["Room", "Period", "Books", "Things", "Workstations"],
+ rooms.map(room => {
+ const books = dv.pages('"books"').where(b => b.location && b.location.
+ const things = dv.pages('"things"').where(b => b.location && b.locatio
+ const workstations = dv.pages('"workstation"').where(b => b.location &&
+ return [
+ dv.fileLink(room.file.path),
+ // affiche la période originale si possible, sinon la version normal
+ room.period ?? normalizePeriod(room.period),
+ books.length,
+ things.length,
+ workstations.length
+ ];
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 20/67
+Ce que ça corrige / ajoute
+Normalisation des valeurs ( Dawn , dawn , DAWN → dawn ) pour que la recherche
+dans order fonctionne.
+Gestion si period est un lien Dataview ( {file:{name: "dawn"}} ) ou un tableau.
+Les rooms sans period (ou vide) apparaissent en premier, comme tu le voulais.
+Si une period n'appartient pas à order , on la place après celles connues en
+suivant l'ordre alphabétique.
+Dis-moi si :
+tu veux que les éléments sans period apparaissent à la fin (je modifierai le
+comparator),
+ou si tu veux afficher une étiquette lisible (ex. Dawn → Aube ) — je peux t'ajouter
+une map de traduction.
+ })
+);
+Peux-tu simplifier le code sachant que period contient
+toujours un lien vers un fichier, par exemple [[curia]]
+Parfait 👍
+Puisque ton champ period contient toujours un lien Obsidian (donc un objet
+Dataview de type link vers un fichier, ex. [[curia]] ), on peut simplifier le code de
+façon nette — plus besoin de toutes les vérifications.
+Voici la version allégée et lisible 👇
+// On récupère toutes les rooms non verrouillées
+let rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false)
+ .array();
+// Ordre des périodes
+const order = ["dawn", "solar", "baronial", "curia", "nocturnal"];
+// Fonction utilitaire : extrait le nom du fichier du lien period
+function periodName(room) {
+ return room.period?.file?.name?.toLowerCase() ?? "";
+}
+// Tri : les rooms sans period en premier, puis selon l’ordre défini
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 21/67
+✅ En résumé
+room.period est toujours un lien → on récupère room.period.file.name .
+Les rooms sans period apparaissent en premier.
+Les autres sont triées selon ton ordre personnalisé.
+Code beaucoup plus clair et court.
+Souhaites-tu que les rooms sans period apparaissent en dernier au lieu de premier
+? (Je peux ajuster une ligne du comparator pour ça.)
+rooms.sort((a, b) => {
+ const pa = periodName(a);
+ const pb = periodName(b);
+ // Si l'un des deux n'a pas de période, il passe avant
+ if (!pa && pb) return -1;
+ if (pa && !pb) return 1;
+ // Sinon, tri selon l’ordre
+ const ia = order.indexOf(pa);
+ const ib = order.indexOf(pb);
+ if (ia === -1 && ib === -1) return pa.localeCompare(pb);
+ if (ia === -1) return 1;
+ if (ib === -1) return -1;
+ return ia - ib;
+});
+// Génération du tableau
+dv.table(
+ ["Room", "Period", "Books", "Things", "Workstations"],
+ rooms.map(room => {
+ const books = dv.pages('"books"').where(b => b.location?.path === room
+ const things = dv.pages('"things"').where(t => t.location?.path === ro
+ const workstations = dv.pages('"workstation"').where(w => w.location?.
+ return [
+ dv.fileLink(room.file.path),
+ room.period ?? "", // affiche le lien [[curia]]
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+Comment puis-je tracer la fonction de tri ?
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 22/67
+Très bonne idée 👏 — tracer la fonction de tri est un excellent réflexe pour
+comprendre pourquoi l’ordre ne correspond pas à ce que tu attends.
+En DataviewJS, tu peux insérer des console.log() pour inspecter la logique
+directement dans la console développeur de ton navigateur ou d’Obsidian
+(raccourci : Ctrl+Shift+I → onglet Console).
+Voici comment faire concrètement 👇
+🧩 Exemple complet avec trace du tri
+let rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false)
+ .array();
+const order = ["dawn", "solar", "baronial", "curia", "nocturnal"];
+function periodName(room) {
+ return room.period?.file?.name?.toLowerCase() ?? "";
+}
+rooms.sort((a, b) => {
+ const pa = periodName(a);
+ const pb = periodName(b);
+ // Log pour comprendre ce qui se compare
+ console.log(`Comparing: ${a.file.name} [${pa}] vs ${b.file.name} [${pb}]
+ // Si l'un n'a pas de period → passe avant
+ if (!pa && pb) return -1;
+ if (pa && !pb) return 1;
+ const ia = order.indexOf(pa);
+ const ib = order.indexOf(pb);
+ // Log de l’ordre trouvé
+ console.log(`→ indices: ${ia} vs ${ib}`);
+ // Tri selon ordre personnalisé ou alphabétique si non trouvé
+ if (ia === -1 && ib === -1) return pa.localeCompare(pb);
+ if (ia === -1) return 1;
+ if (ib === -1) return -1;
+ return ia - ib;
+});
+console.log("✅ Final order:", rooms.map(r => `${r.file.name} (${periodNam
+dv.table(
+ ["Room", "Period"],
+ rooms.map(r => [dv.fileLink(r.file.path), r.period ?? ""])
+);
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 23/67
+🔍 Ce que tu verras dans la console :
+Exemple de sortie :
+Cela te permettra de :
+vérifier les valeurs exactes de period.file.name ,
+confirmer que l’ordre défini dans order est bien appliqué,
+repérer les rooms sans period ( pa vide).
+Souhaites-tu que je t’ajoute un petit tableau Dataview qui affiche, pour débogage,
+les room.file.name et leur period.file.name triés (en plus de la console) ?
+C’est pratique pour visualiser directement dans Obsidian sans ouvrir la console.
+Comparing: library [dawn] vs archive [curia]
+→ indices: 0 vs 3
+Comparing: hall [baronial] vs garden [solar]
+→ indices: 2 vs 1
+✅ Final order: ["hall (baronial)", "garden (solar)", "library (dawn)", "a
+Le probleme vient de la fonction
+function periodName(room) {
+const period = room.period?.file.name.toLowerCase()
+?? "";
+console.log( Periodname = ${period} );
+return period;
+}
+qui return toujours vide.
+Excellent réflexe d’avoir tracé ça 👏
+Et ton observation est très pertinente : si periodName() retourne toujours "" , c’est
+que room.period?.file est undefined .
+👉 Autrement dit, Dataview ne considère pas period comme un lien (link object),
+mais comme une simple chaîne de texte.
+Code
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 24/67
+🔍 Vérifions ce qu’il contient vraiment
+Pour confirmer, essaye ce petit test dans ton DataviewJS (à exécuter seul) :
+Regarde dans la console (Ctrl + Shift + I → onglet Console).
+Tu verras probablement quelque chose comme :
+ou
+ou même
+🧭 Selon le cas, voici la bonne approche
+🟢 Cas 1 — room.period contient un vrai lien Dataview ( [[curia]] )
+✅ Solution :
+Cela récupère le nom du fichier lié, même s’il est dans un sous-dossier.
+🟠 Cas 2 — room.period est une chaîne de texte simple (ex. "curia" )
+✅ Solution :
+for (let room of dv.pages('"rooms"')) {
+ console.log(room.file.name, room.period);
+}
+keeper's lodge [[curia]]
+keeper's lodge curia
+keeper's lodge [Object link]
+const period = room.period.path ? room.period.path.split("/").pop().toLowe
+const period = typeof room.period === "string"
+ ? room.period.toLowerCase()
+dataviewjs
+Code
+Code
+Code
+JavaScript
+JavaScript
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 25/67
+🧩 Version corrigée de ta fonction periodName
+Voici une version robuste, compatible avec les deux cas :
+💡 Bonus – pourquoi ça arrive
+Dataview reconnaît les liens [[nom]] comme des link objects seulement si la
+propriété est écrite seule sur la ligne, comme ceci :
+Mais pas si tu as une liste :
+ou une combinaison texte + lien :
+Dans ces cas-là, il la stocke comme texte brut.
+ : room.period?.path?.split("/").pop().toLowerCase() ?? "";
+function periodName(room) {
+ let period = "";
+ if (room.period) {
+ if (typeof room.period === "string") {
+ period = room.period.toLowerCase();
+ } else if (room.period.path) {
+ period = room.period.path.split("/").pop().toLowerCase();
+ }
+ }
+ console.log(`Periodname = ${period}`);
+ return period;
+}
+period: [[curia]]
+period:
+ - [[curia]]
+period: some text [[curia]]
+JavaScript
+YAML
+YAML
+YAML
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 26/67
+Souhaites-tu que je t’aide à ajuster ton YAML pour que Dataview interprète toujours
+period comme un lien ?
+voici ce que contient room.period:
+[[periods/baronial.md|baronial]]
+🟢 Parfait, tu viens de donner la clé du problème — merci !
+Le contenu [[periods/baronial.md|baronial]] indique que :
+room.period est bien un objet lien ( link ) Dataview,
+mais sa propriété file.name n’existe que si le fichier cible
+( periods/baronial.md ) est dans le coffre Obsidian,
+et surtout : pour récupérer le nom, il faut passer par room.period.path (et non
+room.period.file.name ).
+✅ Voici la version corrigée et simplifiée :
+👉 Explications :
+room.period.path → "periods/baronial.md"
+.split("/").pop() → "baronial.md"
+.replace(".md", "") → "baronial"
+.toLowerCase() → "baronial"
+🧩 Intégré à ton script complet :
+function periodName(room) {
+ if (!room.period) return "";
+ const path = room.period.path ?? "";
+ const name = path.split("/").pop().replace(".md", "").toLowerCase();
+ console.log(`Periodname(${room.file.name}) = ${name}`);
+ return name;
+}
+let rooms = dv.pages('"rooms"')
+ .where(p => p.lock === false)
+JavaScript
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 27/67
+🧠 En résumé
+Type Exemple Accès correct
+Lien simple [[curia]] room.period.path.split("/").po
+p()
+ .array();
+const order = ["dawn", "solar", "baronial", "curia", "nocturnal"];
+function periodName(room) {
+ if (!room.period) return "";
+ const path = room.period.path ?? "";
+ const name = path.split("/").pop().replace(".md", "").toLowerCase();
+ console.log(`Periodname(${room.file.name}) = ${name}`);
+ return name;
+}
+rooms.sort((a, b) => {
+ const pa = periodName(a);
+ const pb = periodName(b);
+ if (!pa && pb) return -1;
+ if (pa && !pb) return 1;
+ const ia = order.indexOf(pa);
+ const ib = order.indexOf(pb);
+ if (ia === -1 && ib === -1) return pa.localeCompare(pb);
+ if (ia === -1) return 1;
+ if (ib === -1) return -1;
+ return ia - ib;
+});
+dv.table(
+ ["Room", "Period", "Books", "Things", "Workstations"],
+ rooms.map(room => {
+ const books = dv.pages('"books"').where(b => b.location?.path === room
+ const things = dv.pages('"things"').where(t => t.location?.path === ro
+ const workstations = dv.pages('"workstation"').where(w => w.location?.
+ return [
+ dv.fileLink(room.file.path),
+ room.period ?? "",
+ books.length,
+ things.length,
+ workstations.length
+ ];
+ })
+);
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 28/67
+Type Exemple Accès correct
+Lien avec alias [[periods/baronial.md|baro
+nial]]
+room.period.path.split("/").po
+p()
+Chaîne texte "curia" room.period directement
+Souhaites-tu que je te montre comment afficher l’alias du lien ( baronial ) plutôt
+que le nom de fichier ?
+(Ça peut être utile si tu veux que le tableau affiche exactement ce qui est visible dans
+la note.)
+y a t il une maniere plus simple d'écrire cette requete
+dataview ?
+dataview
+table soul_slot, with, with2, with3, locatio
+from "workstation"
+where contains(soul_slot, "grail") and stati
+sort location
+Oui, tu peux simplifier nettement ta requête Dataview.
+Voici plusieurs options selon ce que tu préfères : la plus simple, une version lisible,
+et une version robuste.
+✅ Version la plus simple (utilisant not in )
+Dataview permet l’opérateur not in :
+👉 C'est la version la plus courte et propre.
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and station_type not in ("desk", "bed", "gathered")
+sort location
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 29/67
+✅ Version lisible (avec un tableau)
+Tu peux aussi utiliser une liste pour éviter de répéter :
+Lisible, compacte, facile à étendre.
+✅ Version robuste (si certaines stations n’ont pas
+station_type )
+Au cas où certains fichiers n’ont pas de champ station_type :
+Résultat
+La meilleure forme, propre et compacte, est :
+Si tu veux, je peux aussi te proposer une version DataviewJS encore plus flexible
+(par exemple filtrer par station_type dans un ordre précis, ou rendre les noms
+cliquables).
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and !(station_type in ["desk", "bed", "gathered"])
+sort location
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and (station_type != null and station_type not in ("desk", "bed", "gathe
+sort location
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and station_type not in ("desk", "bed", "gathered")
+sort location
+dataview
+dataview
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 30/67
+J'obtiens une erreur:
+Dataview: Error:
+-- PARSING FAILED --------------------------------------------------
+1 | table soul_slot, with, with2, with3, location
+2 | from "workstation"
+> 3 | where contains(soul_slot, "grail") and !
+(station_type in ["desk", "bed", "gathered"])
+| ^
+4 | sort location
+Expected:
+negated field
+Bonne remarque — l’erreur vient du parseur Dataview : il n’accepte pas l’opérateur
+! devant une parenthèse comme en JS. Il faut utiliser le mot-clé not ou la forme
+not in que Dataview comprend.
+Voici 3 versions corrigées (choisis celle que tu préfères) :
+1) Simple et propre — utilise not in
+2) Même logique, avec not (...)
+3) Robuste si certains fichiers n’ont pas station_type
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and station_type not in ("desk", "bed", "gathered")
+sort location
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and not (station_type in ["desk", "bed", "gathered"])
+sort location
+dataview
+dataview
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 31/67
+Explication rapide :
+! n’est pas reconnu par le parseur Dataview dans ce contexte ; utilise not .
+not in est plus concis et lisible.
+La version 3 évite d’exclure accidentellement les fichiers sans champ
+station_type .
+Dis-moi laquelle tu veux utiliser — ou si tu veux qu’on transforme ça en DataviewJS
+pour faire un filtrage plus complexe.
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and (station_type != null and station_type not in ("desk", "bed", "gathe
+sort location
+Non, ca ne passe pas:
+Dataview: Error:
+-- PARSING FAILED --------------------------------------------------
+1 | table soul_slot, with, with2, with3, location
+2 | from "workstation"
+> 3 | where contains(soul_slot, "grail") and
+station_type not in ["desk", "bed", "gathered"]
+| ^
+4 | sort location
+Expected one of the following:
+'*' or '/' or '%', '+' or '-', '>=' or '<=' or '!=' or '=' or '>' or
+'<', 'and' or 'or', /FROM/i, EOF, FLATTEN <value> [AS
+<name>], GROUP BY <value> [AS <name>], LIMIT
+<value>, Not a comment, SORT field [ASC/DESC],
+WHERE <expression>, whitespace
+Réflexion durant quelques secondes
+Merci — bonne remarque. Le parseur Dataview est pointilleux sur la syntaxe. Deux
+points à retenir :
+1. Les listes pour in doivent être entre parenthèses (...) , pas crochets
+[...] .
+2. Si ça coince encore, la solution la plus simple et la plus sûre est d’écrire les
+comparaisons explicitement (ou d’utiliser une regex).
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 32/67
+Voici 3 versions qui fonctionnent — choisis celle que tu préfères.
+1) La plus sûre (compatible avec toutes les versions) — chaines !=
+2) Version courte avec not in (parenthèses obligatoires)
+3) Version avec regex (pratique si tu veux exclure par motif)
+Si aucune de ces versions ne fonctionne encore, dis-moi :
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and station_type != "desk"
+ and station_type != "bed"
+ and station_type != "gathered"
+sort location
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and station_type not in ("desk", "bed", "gathered")
+sort location
+Remarque : les éléments de la liste doivent être entre parenthèses, séparés
+par des virgules — pas de crochets [] .
+table soul_slot, with, with2, with3, location
+from "workstation"
+where contains(soul_slot, "grail")
+ and not regexmatch("^(desk|bed|gathered)$", station_type)
+sort location
+Utile si station_type peut contenir d’autres textes partiels et que tu veux tester
+un motif.
+dataview
+dataview
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 33/67
+la version du plugin Dataview que tu utilises (Settings → Community plugins →
+Dataview),
+et copie exactement une ligne station_type: ... d’un fichier workstation
+(afin que je voie s’il y a des espaces, majuscules, ou valeurs nulles).
+Je t’aiderai à trouver la forme qui passe dans ton vault.
+Quels sont les possibilité de propriété de file dans un
+dataview ?
+par exemple : table file.path
+Dans Dataview, file est un objet spécial qui contient de nombreuses propriétés
+utiles pour afficher, filtrer ou trier les résultats.
+Voici la liste complète et officielle de ce que tu peux utiliser dans une requête
+Dataview / DataviewJS :
+✅ 📂 Propriétés disponibles sur file
+1) Informations générales
+Propriété Description Exemple
+file.name Nom du fichier avec extension "note.md"
+file.stem Nom du fichier sans extension "note"
+file.path Chemin complet depuis la
+racine du vault
+"folder/sub/note.md"
+file.folder Dossier contenant le fichier "folder/sub"
+file.extension Extension "md"
+2) Dates
+Les dates viennent du système de fichiers (et Dataview les convertit en objets date).
+Propriété Description
+file.ctime Date de création du fichier
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 34/67
+Propriété Description
+file.mtime Date de dernière modification
+file.size Taille du fichier (en bytes)
+3) Listes utiles
+Propriété Description
+file.tags Tous les tags présents dans le fichier
+file.inlinks Liste des notes qui lient vers celle-ci
+file.outlinks Liste des liens sortants depuis cette note
+file.etags Tags enracinés dans le YAML
+file.links Tous les liens présents dans le fichier
+file.aliases Alias définis dans le YAML
+4) Embeddings & blocs
+Propriété Description
+file.lists Les listes à puces extraites
+file.tasks Toutes les tâches du fichier
+file.sections Sections Markdown (h1, h2, etc.)
+file.frontmatter L’ensemble du YAML sous forme d’objet
+Exemple :
+5) Informations internes
+Propriété Description
+file.link Un lien Dataview vers la note elle-même
+table file.frontmatter
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 35/67
+Propriété Description
+file.day Si la note est une daily note (YYYY-MM-DD)
+file.project Si tu utilises dataview project (optionnel)
+🎯 Exemples pratiques
+Afficher le chemin complet
+Afficher le dossier
+Afficher la date de création
+Afficher les tags
+Trier par date de modification
+💡 Bonus : propriétés accessibles en DataviewJS
+En DataviewJS, tu peux accéder à beaucoup plus :
+table file.path
+table file.folder
+table file.ctime
+table file.tags
+table file.mtime
+sort file.mtime desc
+dataview
+dataview
+dataview
+dataview
+dataview
+JavaScript
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 36/67
+Te donnera un objet complet, avec toutes les clés que Dataview expose.
+Exemple pour explorer :
+Si tu veux, je peux aussi te faire une fiche ultra-compacte ou un tableau ready-tocopy dans Obsidian.
+dv.current().file
+console.log(dv.current().file);
+est-il possible de faire une jointure avec dataview ?
+j'ai un fichier subject/edict.md
+j'ai un fichier crafting/worm.md qui contient une
+propriété subject avec la valeur [[edict]] et une
+propriété level=10
+Je voudrais faire une jointure de type
+table
+Oui — Dataview ne propose pas de jointure SQL “officielle”, mais il est possible de
+faire des jointures en utilisant les propriétés link , file , map , filter , et les
+functions DataviewJS.
+Il existe deux approches :
+✅ 1) Jointure simple avec Dataview (mode requête)
+Si ton fichier crafting/worm.md contient :
+Et ton fichier subject/edict.md est une note avec son propre contenu, alors tu peux
+obtenir les fichiers qui pointent vers lui avec :
+🔹 Jointure “inverse” : trouver les pages qui référencent edict
+subject: [[edict]]
+level: 10
+dataviewjs
+YAML
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 37/67
+👉 Cela donne déjà une jointure “à 1 niveau”, car subject est un lien vers la note
+edict .
+✅ 2) Jointure avancée : joindre la note edict pour
+récupérer ses propriétés
+Si tu veux récupérer des propriétés stockées dans edict.md (ex : category ,
+description , etc.), alors il faut accéder via :
+Mais Dataview Query (DQL) est limité.
+La vraie jointure se fait en DataviewJS :
+✅ 3) Jointure complète en DataviewJS (équivalent
+SQL JOIN)
+Voici le modèle recommandé :
+👉 Jointure entre “subject/edict.md” et les notes qui le référencent
+table level, subject
+from "crafting"
+where subject = [[edict]]
+table
+ thisfile.category,
+ thisfile.description,
+ craft.level
+from "crafting"
+let thisfile = subject
+where subject = [[edict]]
+const subjects = dv.page("subject/edict"); // page cible
+const crafts = dv.pages("crafting")
+ .where(p => p.subject && p.subject.path === subjects.file.path);
+dv.table(
+ ["Craft", "Level", "Subject Category"],
+ crafts.map(c => [
+ c.file.link,
+ c.level,
+ subjects.category // propriété venant de edict.md
+dataview
+dataview
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 38/67
+Ce que tu obtiens :
+crafting/worm.md → level , etc.
+subject/edict.md → ses propriétés (par ex. category )
+Le tableau final : une jointure entre les deux notes.
+🎯 Exemple adapté à ton cas :
+Supposons que edict.md contient :
+Et tu veux :
+| crafting | level | subject | category | difficulty |
+Alors :
+✔ Résumé
+❌ Pas de jointure SQL dans Dataview
+✔ Mais :
+Jointures simples possibles en DQL si une propriété contient un lien
+( [[note]] ).
+ ])
+);
+category: "forbidden knowledge"
+difficulty: "hard"
+const subjectPage = dv.page("subject/edict");
+dv.table(
+ ["Craft", "Level", "Subject", "Category", "Difficulty"],
+ dv.pages("crafting")
+ .where(p => p.subject && p.subject.path === subjectPage.file.path)
+ .map(p => [
+ p.file.link,
+ p.level,
+ p.subject,
+ subjectPage.category,
+ subjectPage.difficulty
+ ])
+);
+YAML
+dataviewjs
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 39/67
+Jointures complètes possibles avec DataviewJS
+N’hésite pas à me donner un exemple exact de ce que tu veux afficher en tableau :
+→ colonnes attendues
+→ fichiers concernés
+Je te ferai la requête complète 😊
+qu'est ce qu'une dactylite ?
+Une Dactylite (ou “doigt-saucisse”) est une inflammation caractéristique d’un doigt ou
+d’un orteil entier, qui gonfle et s’enroule d’un seul bloc.
+🔍 Caractéristiques principales
+Elle se présente par une tuméfaction diffuse d’un doigt ou d’un orteil —
+articulations, tendons, tissus mous sont concernés.
+L’aspect est souvent décrit comme “saucisse” : tout le doigt / orteil est gonflé,
+rouge, chaud, douloureux.
+Elle peut se produire dans le cadre de plusieurs affections, notamment :
+Rhumatisme psoriasique (RPso) — la dactylite est un signe clinique typique.
+Drépanocytose — chez l’enfant, la dactylite peut être une crise vasoocclusive “mains-pieds”.
+🩺 Pourquoi ça se produit
+Dans le cas du rhumatisme psoriasique : inflammation des articulations, des
+gaines tendineuses (ténosynovite) et des enthèses (insertion tendon/os) au
+niveau du doigt ou de l’orteil.
+Dans la drépanocytose : les vaisseaux dans les extrémités peuvent être occlus ou
+comprimés, provoquant douleur, gonflement et inflammation.
+⚠️ Pourquoi la dactylite est importante
+Elle peut être un indicateur de gravité de l’atteinte articulaire/periphérique. Par
+exemple, dans le rhumatisme psoriasique, la présence de dactylite est corrélée à
+des lésions radiographiques plus sévères.
+Si non traitée ou récurrente, elle peut conduire à une perte de mobilité,
+déformation de l’articulation ou progression de l’atteinte articulaire.
+🔧 Signes à repérer
+citizenpso.fr +2
+URML Martinique +1
+citizenpso.fr +1
+URML Martinique +1
+iLiveOK +1
+citizenpso.fr
+iLiveOK +1
+litar.org.tn
+sparthritis.ca
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 40/67
+Gonflement soudain ou progressif d’un doigt ou d’un orteil entier (pas seulement
+une articulation)
+Douleur, chaleur, rougeur
+Le doigt ou l’orteil “tout rond”, uniforme, sans différence nette entre phalanges
+comme on verrait classiquement pour une arthrite isolée
+Si tu veux, je peux regarder les traitements de la dactylite (médical, physiothérapie,
+suivi) et te donner un résumé clair en français. Veux-tu cela ?
+Sources
+quelles sont les causes ?
+La dactylite (gonflement uniforme d’un doigt ou d’un orteil) n’est pas une maladie en
+soi : c’est un symptôme.
+Elle peut avoir plusieurs causes, mais les plus fréquentes sont regroupées en 3
+grandes catégories : maladies inflammatoires, infections, troubles
+vasculaires/hématologiques.
+Voici une explication claire et complète :
+🟣 1) Causes inflammatoires (les plus fréquentes)
+✅ Rhumatisme psoriasique (PsA)
+C’est la cause la plus typique.
+La dactylite apparaît parce que l’inflammation touche en même temps :
+les articulations du doigt/orteil (arthrite),
+les tendons (ténosynovite),
+les points d’insertion tendineuse (enthésite).
+👉 Le doigt entier gonfle “en saucisse”.
+✅ Spondylarthrites (SPA)
+Dont :
+spondylarthrite ankylosante,
+arthrite réactive,
+entéro-arthrites (liées à maladies intestinales).
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 41/67
+Même mécanisme que dans la PsA : inflammation diffuse de toutes les structures du
+doigt.
+⚠️ Signes d’alerte inflammatoires
+douleurs nocturnes ou au repos,
+raideur matinale prolongée,
+antécédents de psoriasis, colites, douleurs lombaires inflammatoires.
+🔴 2) Causes infectieuses
+✅ Infection des tissus profonds du doigt ou de l’orteil
+Exemples :
+dactylite tuberculeuse (rare),
+infections bactériennes profondes (staphylocoque, streptocoque),
+infection fongique profonde.
+Ces infections peuvent provoquer un gonflement diffus de la totalité d’un doigt.
+👉 Généralement rouge, chaud, très douloureux.
+⚠️ Signes d’alerte infectieux
+fièvre,
+douleur très localisée,
+blessure récente,
+rougeur importante,
+état général diminué.
+🟡 3) Causes hématologiques / vasculaires
+✅ Drépanocytose (anémie falciforme)
+Chez l’enfant, une crise vaso-occlusive peut provoquer une dactylite “mains-pieds” :
+gonflement symétrique,
+douleur importante.
+⚠️ Autres troubles vasculaires possibles
+ischémie locale,
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 42/67
+œdèmes lymphatiques (rare mais possible).
+🟢 4) Causes traumatiques
+Un choc important peut provoquer un gonflement diffus…
+Mais rarement toute la forme “en saucisse”.
+À évoquer si :
+un seul doigt est touché,
+douleur immédiate après un traumatisme.
+🟣 5) Causes métaboliques (plus rares)
+🔸 Goutte ou pseudo-goutte
+Peuvent parfois imiter une dactylite, même si typiquement elles touchent une seule
+articulation.
+🧭 En résumé
+Groupe Causes principales
+Inflammatoires Rhumatisme psoriasique (le plus fréquent),
+spondylarthrites
+Infectieuses Tuberculose, bactéries profondes
+Hématologiques Drépanocytose
+Traumatiques Choc, contusion
+Métaboliques Goutte (rare)
+❓ Si tu veux, je peux t’aider à préciser :
+les symptômes permettant de différencier les causes,
+ce qui nécessite une consultation rapide,
+ou simplement répondre à tes questions selon ton contexte.
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 43/67
+quelle différence entre arthrite et arthrose ?
+Voici une explication claire et simple pour bien distinguer arthrite et arthrose, deux
+termes souvent confondus :
+🟣 ARTHRITE
+👉 Inflammation d’une ou plusieurs articulations
+🔥 Mécanisme
+Le système immunitaire s’active de manière anormale → inflammation → douleur,
+chaleur, rougeur, gonflement.
+🔍 Causes fréquentes
+Maladies auto-immunes : polyarthrite rhumatoïde, rhumatisme psoriasique
+Infection : arthrite septique
+Cristaux : goutte (acide urique), chondrocalcinose
+Réaction inflammatoire : arthrite réactive
+🧪 Signes typiques
+Douleurs au repos, surtout la nuit
+Gonflement et chaleur articulaire
+Raideur matinale longue (> 30 minutes)
+Bilan sanguin souvent inflammatoire
+🧠 En résumé
+➡️ Arthrite = inflammation des articulations
+🟢 ARTHROSE
+👉 Usure mécanique du cartilage (maladie dégénérative)
+⚙️ Mécanisme
+Le cartilage s’use progressivement → l’articulation “frotte” → douleur lors de l’effort.
+🔍 Causes fréquentes
+Âge / vieillissement
+Surcharge mécanique
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 44/67
+Surpoids
+Séquelles de blessures
+Morphologie anormale de l’articulation
+🧪 Signes typiques
+Douleur à l’effort, qui diminue au repos
+Peu ou pas de gonflement
+Raideur courte le matin (< 10 minutes)
+Pas de fièvre ni inflammation majeure au bilan sanguin
+🧠 En résumé
+➡️ Arthrose = usure de l’articulation
+🧭 Différence en une phrase
+👉 Arthrite = inflammation (souvent auto-immune)
+👉 Arthrose = usure mécanique liée au temps ou à une surcharge
+Si tu veux, je peux aussi t’expliquer :
+comment différencier les deux quand on a mal,
+quels examens sont utilisés,
+ou encore si la dactylite que tu évoquais se rapproche plutôt de l’un ou de l’autre.
+Est-il possible de découper ce fil de chat en plusieurs
+fichiers md afin de les stocker dans un coffre obsidian ?
+J'aimerai pour chaque question avoir un fichier avec un
+paragraphe #question et un paragraphe #réponse.
+J'aimerai également avoir une propriété pour
+catégoriser le contenu du fichier, par exemple: maladie,
+alimentation, anglais. Peux-tu me donner une
+procédure pour éffectuer celà sur n'importe quel fil de
+chat ?
+Oui, c’est tout à fait possible — et même assez courant — de vouloir archiver un fil
+de discussion ChatGPT dans Obsidian en le découpant en plusieurs fichiers
+Markdown structurés.
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 45/67
+Voici une procédure universelle, que vous pourrez utiliser pour n’importe quel fil de
+chat, quelle que soit sa longueur.
+✅ Procédure pour découper un fil de chat en
+plusieurs fichiers Markdown dans Obsidian
+Objectif
+Pour chaque question du chat, créer un fichier .md avec :
+Un titre
+Un paragraphe # Question
+Un paragraphe # Réponse
+Un bloc de propriétés YAML incluant :
+category:
+éventuellement date: , source: , etc.
+🧩 Étape 1 — Exporter le fil de chat
+Selon l’outil que vous utilisez :
+Option 1 : Depuis ChatGPT
+1. Ouvrir le chat.
+2. Cliquer sur ⋯ → Export Chat.
+3. Télécharger le fichier .html ou .json.
+Option 2 : Copier-coller manuel
+1. Faire défiler toute la conversation.
+2. Sélectionner tout le texte avec la souris.
+3. Coller dans un fichier texte temporaire.
+🧩 Étape 2 — Nettoyer le texte
+Votre objectif est d’obtenir un texte organisé en blocs alternant :
+Si vous avez exporté en HTML, vous pouvez :
+User: ...
+Assistant: ...
+User: ...
+Assistant: ...
+Code
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 46/67
+ouvrir le fichier dans un navigateur
+copier le contenu textuel
+coller dans un éditeur comme Obsidian, VSCode, ou un éditeur Markdown
+Ensuite :
+supprimer les logos, les timestamps, les boutons
+vérifier que chaque question est bien sur une ligne reconnaissable (exemple :
+commence par User: )
+🧩 Étape 3 — Identifier chaque question / réponse
+Comment trouver les questions ?
+Toutes les vraies questions :
+se trouvent toujours dans les messages User
+se terminent par un ?
+sont souvent sur une seule ligne
+💡 Astuce : dans VSCode ou Obsidian, utilisez la recherche regex :
+Cela identifie les questions.
+🧩 Étape 4 — Créer un fichier par question
+Pour chaque question :
+➤ 1. Créer un nouveau fichier
+Nom recommandé :
+➤ 2. Ajouter un en-tête YAML
+Exemples de catégories :
+catégorie: santé
+catégorie: alimentation
+catégorie: anglais
+catégorie: programmation
+User:.*\?
+2025-01-28 - arthrite vs arthrose.md
+Code
+Code
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 47/67
+catégorie: obsidian
+catégorie: informatique
+Format YAML :
+➤ 3. Ajouter les sections
+Répétez l'opération pour chaque question.
+🧩 Étape 5 — Automatiser (optionnel)
+Si le fil de discussion est très long, je peux vous fournir un script automatique :
+📌 Script possible selon votre choix :
+Python
+Obsidian Templater (Javascript)
+Shell Bash (Linux)
+Regex + Macro (Keyboard Maestro / AutoKey)
+Plugin Obsidian personnalisé
+Ce script pourrait :
+détecter chaque message du user contenant un ?
+regrouper tous les messages assistant jusqu’à la prochaine question
+créer automatiquement 1 fichier Markdown par paire Q/R
+ajouter le YAML
+vous demander une catégorie
+Si vous voulez, je peux générer ce script immédiatement.
+---
+category: santé
+tags: [chatgpt, import]
+source: chatgpt
+date: 2025-01-28
+---
+# Question
+Quelle différence entre arthrite et arthrose ?
+# Réponse
+(là vous collez ma réponse complète depuis le chat)
+YAML
+Code
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 48/67
+🧩 Étape 6 — Importer dans votre coffre Obsidian
+1. Ouvrez votre vault.
+2. Déposez les fichiers md dans le dossier de votre choix, par exemple :
+3. Obsidian va les indexer automatiquement.
+📘 Exemple concret (sur votre question actuelle)
+Fichier : Arthrite vs arthrose.md
+🎁 Vous voulez que je vous génère un script
+automatique pour découper un fil de chat ?
+Si oui, dites-moi :
+📌 Vous êtes sous Linux → oui
+📌 Vous préférez quel type de script :
+Python (le plus simple)
+Bash
+Templater Obsidian
+Et je vous fais le script entièrement adapté à vos usages Obsidian.
+ChatGPT/
+ santé/
+ informatique/
+ anglais/
+---
+category: santé
+date: 2025-02-04
+source: chatgpt
+---
+# Question
+Quelle différence entre arthrite et arthrose ?
+# Réponse
+(texte complet collé ici)
+Code
+YAML
+Code
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 49/67
+Comment dans obsidian, je peux transformer ce texte
+en tableau ?
+Type de consultation Tarif habituel Base Sécu
+Remboursement Sécu Reste à charge
+Secteur 1 (avec médecin traitant) 30 € 30 € 20 €
+~10 €
+Secteur 2 (avec médecin traitant) 40–80 € 30 € 20 €
+variable
+Hors parcours coordonné 30 € ou + 30 € 8 € plus
+élevé
+Dans Obsidian, le plus simple est de le transformer en tableau Markdown.
+Obsidian le rendra automatiquement sous forme de tableau lisible.
+✅ Version prête à coller (tableau Markdown)
+Copie-colle exactement ceci dans ta note :
+➡️ Obsidian l’affichera automatiquement comme un tableau.
+🛠 Astuce pratique dans Obsidian (sans tout retaper)
+Si ton texte est déjà collé avec des tabulations :
+1. Passe en mode édition
+2. Sélectionne les lignes
+3. Remplace chaque tabulation par | (recherche/remplacement)
+4. Ajoute :
+une ligne |---|---|...|
+des | au début et à la fin des lignes
+📊 Option bonus : tableau Dataview (si tu veux aller plus loin)
+| Type de consultation | Tarif habituel | Base Séc
+|---------------------------------------------|----------------|----------
+| Secteur 1 (avec médecin traitant) | 30 € | 30 €
+| Secteur 2 (avec médecin traitant) | 40–80 € | 30 €
+| Hors parcours coordonné | 30 € ou + | 30 €
+Markdown
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 50/67
+Si tu veux trier, filtrer ou enrichir ce tableau plus tard, tu peux aussi le transformer
+en données Dataview (YAML par ligne).
+Dis-le-moi si ça t’intéresse.
+✔ En résumé
+✅ Tableau Markdown = solution la plus simple
+⚡ Compatible avec Obsidian sans plugin
+📱 Lisible sur mobile
+Si tu veux, je peux aussi :
+aligner les colonnes,
+ajouter une colonne “commentaire”,
+ou transformer ça en fiche “Santé / Remboursements” avec propriétés YAML.
+Qu'est-ce que cela donne en données dataview ?
+Très bonne question 👍
+Voici la version Dataview “propre”, structurée pour être exploitable (tri, filtres,
+calculs).
+✅ Étape 1 — Créer une note par type de consultation
+Par exemple dans un dossier :
+📄 secteur-1.md
+santé/consultations/
+---
+type: consultation
+secteur: 1
+parcours: coordonné
+tarif_min: 30
+tarif_max: 30
+base_secu: 30
+remboursement_secu: 20
+Code
+YAML
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 51/67
+📄 secteur-2.md
+📄 hors-parcours.md
+✅ Étape 2 — Afficher le tableau Dataview
+Dans une autre note, insère :
+reste_charge: 10
+---
+---
+type: consultation
+secteur: 2
+parcours: coordonné
+tarif_min: 40
+tarif_max: 80
+base_secu: 30
+remboursement_secu: 20
+reste_charge: variable
+---
+---
+type: consultation
+secteur: 1
+parcours: hors
+tarif_min: 30
+tarif_max: null
+base_secu: 30
+remboursement_secu: 8
+reste_charge: élevé
+---
+table
+ secteur as "Secteur",
+ parcours as "Parcours",
+ tarif_min as "Tarif min (€)",
+ tarif_max as "Tarif max (€)",
+ base_secu as "Base Sécu (€)",
+ remboursement_secu as "Remboursement (€)",
+ reste_charge as "Reste à charge"
+from "santé/consultations"
+where type = "consultation"
+sort secteur, parcours
+YAML
+YAML
+dataview
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 52/67
+📊 Résultat attendu
+Secteur Parcours
+Tarif min
+(€)
+Tarif max
+(€)
+Base Sécu
+(€)
+Remboursement
+(€)
+Rest
+char
+1 coordonné 30 30 30 20 10
+2 coordonné 40 80 30 20 varia
+1 hors 30 — 30 8 élevé
+🧠 Pourquoi cette structure est bonne
+✔ Données numériques exploitables
+✔ Possibilité de calculs ( tarif - remboursement )
+✔ Tri / filtres / regroupements
+✔ Évolutif (mutuelle, spécialité, date, etc.)
+⚠️ Variante “tout dans une seule note” (moins
+recommandée)
+👉 Mais Dataview gère moins bien les tableaux imbriqués.
+👉 Si tu veux
+Je peux aussi :
+calculer automatiquement le reste à charge,
+intégrer la mutuelle,
+ou t’aider à décider tableau Markdown vs Dataview selon ton usage réel.
+Dis-moi comment tu comptes utiliser ces données dans Obsidian.
+consultations:
+ - secteur: 1
+ parcours: coordonné
+ tarif_min: 30
+ tarif_max: 30
+ remboursement: 20
+ - secteur: 2
+ parcours: coordonné
+ tarif_min: 40
+ tarif_max: 80
+ remboursement: 20
+YAML
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 53/67
+La solution qui me convient le mieux :
+Passe en mode édition
+Sélectionne les lignes
+Remplace chaque tabulation par |
+(recherche/remplacement)
+Ajoute une ligne |---|---|...|
+Ajoute des | au début et à la fin des lignes
+Existe-t-il un plugin faisant cela sur une sélection ?
+Oui 👍 — il existe plusieurs façons (plugins inclus) de faire exactement ça sur
+une sélection, sans bricolage manuel.
+Je te les présente par ordre de simplicité / robustesse, et je te dirai laquelle je
+recommande.
+🥇 La meilleure solution : plugin “Advanced Tables”
+👉 Plugin : Advanced Tables (officiel, très fiable)
+Ce qu’il permet
+Convertir un texte tabulé ou séparé par espaces en tableau Markdown
+Aligner automatiquement les colonnes
+Reformater un tableau existant
+Tout ça sur une sélection
+Installation
+1. Obsidian → ⚙️ Settings
+2. Community plugins
+3. Parcourir → chercher Advanced Tables
+4. Installer + Activer
+Utilisation (ton cas précis)
+1. Sélectionne ton texte :
+Type de consultation Tarif habituel Base Sécu ...
+Code
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 54/67
+2. Ouvre la palette de commandes ( Ctrl + P )
+3. Tape :
+Advanced Tables: Convert selection to table
+4. 💥 Tableau Markdown généré automatiquement
+➡️ C’est exactement ton besoin, sans regex ni édition manuelle.
+🥈 Alternative : “Text Format” (plus généraliste)
+👉 Plugin : Text Format
+Ce qu’il permet
+Recherche / remplacement sur sélection
+Macros de transformation
+Très utile pour les workflows personnalisés
+Tu pourrais créer une macro :
+tab → |
+ajout automatique de | début / fin
+insertion de la ligne |---|---|
+⚠️ Plus puissant mais moins immédiat qu’Advanced Tables.
+🥉 Sans plugin : Templater (JS custom)
+Si tu utilises déjà Templater, tu peux créer une commande personnalisée :
+➡️ Puissant, mais clairement overkill pour ton usage.
+✅ Ma recommandation claire
+<%*
+const text = tp.file.selection();
+const lines = text.split("\n");
+const cols = lines[0].split("\t").length;
+const header = lines.map(l =>
+ "| " + l.split("\t").join(" | ") + " |"
+);
+const sep = "| " + Array(cols).fill("---").join(" | ") + " |";
+tR = [header[0], sep, ...header.slice(1)].join("\n");
+%>
+JavaScript
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 55/67
+👉 Installe Advanced Tables
+C’est :
+rapide
+fiable
+fait pour Obsidian
+parfait pour transformer des données copiées (Excel, Web, PDF)
+Tu sélectionnes → une commande → terminé.
+Si tu veux, je peux aussi te proposer :
+un raccourci clavier pour la conversion
+un workflow “copier depuis Excel → tableau Obsidian propre”
+ou une combinaison Advanced Tables + Dataview
+Dis-moi 👍
+La solution avec Advances tables me plait bien mais je
+n'ai pas l'option "convert selection to table"
+Tu n’as rien raté 👍
+👉 Dans les versions récentes d’Obsidian, la commande “Convert selection to
+table” n’existe plus sous ce nom, et selon les plugins activés, elle peut… ne pas
+exister du tout.
+Voici ce qui se passe réellement, et comment faire concrètement.
+✅ La réalité avec Advanced Tables
+Advanced Tables ne convertit pas directement du texte brut tabulé en tableau
+Markdown.
+Il sert surtout à :
+formater un tableau existant
+aligner les colonnes
+éditer facilement les tableaux
+👉 C’est pour ça que tu ne vois pas la commande.
+Mais il existe 2 solutions simples et propres, dont une recommandée.
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 56/67
+🥇 Solution recommandée : plugin “Paste as Markdown”
+Pourquoi ?
+Parce que ton cas typique est :
+👉 Paste as Markdown fait exactement :
+tabulations → |
+ajoute la ligne |---|
+ajoute les | début / fin
+fonctionne sur une sélection ou au collage
+Installation
+1. ⚙️ Settings → Community plugins
+2. Cherche Paste as Markdown
+3. Installe + active
+Utilisation
+1. Copie ton tableau (source externe)
+2. Dans Obsidian :
+Ctrl + Shift + V (ou via la palette)
+3. 🎉 Tableau Markdown parfait
+➡️ Ensuite, Advanced Tables prend le relais pour l’alignement.
+🥈 Solution sans plugin supplémentaire (rapide)
+Si ton texte est déjà dans Obsidian avec des tabulations :
+1. Sélectionne le texte
+2. Ctrl + H (recherche/remplacement)
+3. Remplacer :
+Rechercher : \t
+Remplacer par : |
+mode regex ❌ (désactivé)
+4. Ajoute manuellement :
+| au début et à la fin
+la ligne |---|---|---|
+Puis :
+Ctrl + P → Advanced Tables: Format table
+texte copié depuis un tableau (web, Excel, PDF…)
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 57/67
+🥉 Alternative tout-en-un : plugin “Table Editor”
+Plugin communautaire différent d’Advanced Tables.
+Fonction :
+convertir texte sélectionné → tableau
+édition visuelle
+Mais :
+moins stable
+moins maintenu
+👉 Je ne le recommande pas si tu veux un setup durable.
+✅ Conclusion claire
+Besoin Outil
+Convertir texte → tableau Paste as Markdown
+Éditer / aligner tableau Advanced Tables
+Zéro plugin Recherche/remplacement
+👉 Le combo Paste as Markdown + Advanced Tables est le meilleur setup
+Obsidian aujourd’hui.
+Si tu veux, je peux aussi :
+te proposer un raccourci clavier optimal
+te faire un workflow Excel → Obsidian
+ou un script Templater ultra-rapide
+Dis-moi 👍
+puis-je prendre de l'ibuprofene et en quel dosage
+sachant que je prendre de la cortisone 10mg ?
+Je vais être très clair et prudent, parce que c’est une situation à risque.
+⚠️ Ibuprofène + cortisone : association déconseillée
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 58/67
+En règle générale : NON, il n’est pas recommandé de prendre de l’ibuprofène
+quand on prend déjà de la cortisone (10 mg) sans avis médical.
+❗ Pourquoi ?
+Parce que cortisone + ibuprofène :
+augmentent fortement le risque d’ulcère et d’hémorragie digestive
+irritent tous les deux la muqueuse de l’estomac
+ce risque existe même à faible dose et sur une courte durée
+👉 Le risque est réel, documenté, et souvent sous-estimé.
+🧠 Ce que font habituellement les médecins
+Quand un anti-inflammatoire est vraiment nécessaire malgré la cortisone, ils :
+évaluent les facteurs de risque (âge, estomac fragile, antécédents, autres
+médicaments)
+prescrivent un protecteur gastrique (IPP : oméprazole, pantoprazole…)
+limitent dose + durée
+surveillent étroitement
+👉 Ce n’est pas de l’automédication.
+✅ Ce qui est généralement plus sûr
+👉 Paracétamol (Doliprane)
+C’est le traitement de première intention en association avec la cortisone.
+Dosage usuel adulte (hors contre-indication) :
+500 mg à 1 g par prise
+maximum 3 g / jour
+espacés de 4 à 6 h
+⚠️ Ne pas dépasser les doses, surtout si foie fragile.
+❌ Quand il ne faut surtout PAS associer
+Ne prends pas d’ibuprofène si tu as :
+antécédent d’ulcère ou de saignement digestif
+douleurs gastriques, reflux importants
+traitement anticoagulant
+insuffisance rénale
+âge avancé sans suivi médical
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 59/67
+🧭 En résumé
+🔴 Ibuprofène + cortisone = déconseillé
+🟢 Paracétamol = option la plus sûre
+🟣 Si un anti-inflammatoire est nécessaire → avis médical obligatoire
+Si tu veux, tu peux me dire :
+pour quelle douleur (articulaire, inflammatoire, dactylite, autre),
+depuis combien de temps tu prends la cortisone,
+si c’est un traitement court ou au long cours,
+et je t’aiderai à réfléchir aux options les plus sûres, sans jamais te mettre en danger.
+lactulose + cortisone c'est possible ?
+Réponse courte et claire : oui, lactulose + cortisone, c’est possible 👍
+Il n’y a pas d’interaction dangereuse connue entre les deux.
+✅ Pourquoi l’association est autorisée
+Lactulose
+→ laxatif osmotique, agit uniquement dans l’intestin
+→ n’est pas absorbé par l’organisme
+Cortisone (10 mg)
+→ agit au niveau systémique (anti-inflammatoire / immunosuppresseur)
+👉 Leurs mécanismes sont indépendants, donc compatibles.
+⚠️ Points de vigilance (importants mais non bloquants)
+1️⃣ Effet digestif
+Le lactulose peut provoquer :
+ballonnements
+gaz
+diarrhée si dose trop élevée
+La cortisone peut parfois irriter l’estomac
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 60/67
+👉 Prends la cortisone pendant un repas, et ajuste le lactulose progressivement.
+2️⃣ Équilibre électrolytique (rare mais à connaître)
+En cas de diarrhée prolongée avec lactulose :
+perte de potassium possible
+Or la cortisone peut aussi favoriser une baisse du potassium
+👉 Si diarrhée importante ou prolongée → réduire la dose et consulter
+💊 Conseils pratiques
+✔️ Lactulose : commence bas (ex. 10–15 ml) puis ajuste
+✔️ Cortisone : toujours avec un repas
+✔️ Hydratation suffisante
+❌ Éviter laxatifs stimulants (séné, bisacodyl) sans avis médical
+🧭 En résumé
+Association Verdict
+Lactulose + cortisone ✅ Possible
+Risque majeur ❌ Non
+Surveillance ⚠️ Diarrhée / potassium si usage prolongé
+Si tu veux, tu peux me dire :
+depuis quand tu prends la cortisone,
+si le lactulose est ponctuel ou quotidien,
+et pour quel problème (constipation liée au traitement, autre),
+je t’aiderai à ajuster la dose de façon sûre.
+spasfon + cortisone c'est possible ?
+Oui — Spasfon + cortisone, c’est possible 👍
+Il n’y a pas d’interaction connue problématique entre les deux.
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 61/67
+✅ Pourquoi l’association est autorisée
+Spasfon (phloroglucinol)
+→ antispasmodique, agit sur les spasmes digestifs ou urinaires
+Cortisone (10 mg)
+→ anti-inflammatoire systémique
+👉 Les mécanismes sont différents et ne se potentialisent pas négativement.
+💊 Comment les prendre
+Cortisone :
+toujours au cours d’un repas (matin de préférence)
+Spasfon :
+pendant ou en dehors des repas
+en cas de douleurs/spasmes
+Ils peuvent être pris le même jour, sans espacement particulier obligatoire.
+⚠️ Points de vigilance (simples)
+Le Spasfon est en général très bien toléré
+La cortisone peut parfois irriter l’estomac
+👉 si douleurs gastriques : repas + éviter AINS (ibuprofène)
+Consulte si :
+douleurs abdominales persistantes ou inhabituelles
+fièvre, vomissements, sang dans les selles
+🧭 En résumé
+Association Verdict
+Spasfon + cortisone ✅ Compatible
+Interaction connue ❌ Non
+Précaution Cortisone avec repas
+Si tu veux, dis-moi pour quel type de douleur tu prends le Spasfon (intestinales,
+urinaires, liées au stress, autre).
+Je peux t’aider à vérifier que c’est bien le bon choix et quand consulter.
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 62/67
+Comment réduire la taille d'une image insérer par un
+lien comme ceci ![[le courage tranquille.jpg]] dans un
+markdown ?
+Dans Obsidian, tu as plusieurs façons simples de réduire la taille d’une image
+insérée avec un lien interne comme :
+Voici les solutions qui fonctionnent réellement, par ordre de simplicité.
+✅ Méthode recommandée (spécifique à Obsidian)
+➜ Utiliser le | largeur directement dans le lien
+➡️ L’image sera affichée avec une largeur de 300 px, hauteur ajustée
+automatiquement.
+Autres exemples
+✅ Largeur × hauteur
+⚠️ À utiliser seulement si tu veux forcer les proportions.
+![[le courage tranquille.jpg]]
+![[le courage tranquille.jpg|300]]
+![[le courage tranquille.jpg|150]]
+![[le courage tranquille.jpg|500]]
+![[le courage tranquille.jpg|300x200]]
+Code
+Markdown
+Markdown
+Markdown
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 63/67
+🧠 Bon à savoir
+La valeur est en pixels
+Ça fonctionne :
+en mode lecture
+en mode édition (Live Preview)
+Compatible avec Dataview, canvas, exports PDF
+🔧 Alternative universelle (HTML)
+Si tu veux plus de contrôle :
+Ou avec chemin :
+❌ Ce qui ne fonctionne pas
+Markdown standard ( ![alt](img.jpg){width=300} ) ❌
+CSS inline dans Markdown ❌
+🧭 Résumé rapide
+Méthode Fonctionne dans Obsidian Recommandée
+`![[image.jpg 300]]` ✅
+`![[image.jpg 300x200]]` ✅
+<img width="300"> ✅ ⭐⭐
+Si tu veux, je peux aussi t’expliquer :
+comment centrer l’image
+comment appliquer une classe CSS
+comment faire un aperçu cliquable
+ou comment gérer les images dans un export PDF
+<img src="le courage tranquille.jpg" width="300">
+<img src="assets/images/le courage tranquille.jpg" width="300">
+HTML
+HTML
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 64/67
+Dis-moi 👍
+Est-il possible de forcer l'affichage à gauche du texte ?
+Oui 👍 c’est possible, et Obsidian offre plusieurs solutions selon le niveau de
+contrôle que tu veux.
+Je te les présente du plus simple au plus puissant.
+🥇 Solution simple et propre (HTML inline)
+C’est la plus fiable si tu veux image à gauche + texte qui s’enroule à droite.
+Puis ton texte juste après :
+➡️ Résultat : image à gauche, texte fluide à droite.
+🥈 Solution Obsidian + CSS class (propre et réutilisable)
+1️⃣ Créer une classe CSS (une fois)
+Dans ton snippet CSS ( .obsidian/snippets/images.css ) :
+Activer le snippet dans Settings → Appearance → CSS snippets.
+<img src="le courage tranquille.jpg" width="250" style="float:left; margin
+Voici ton texte qui va s’afficher à droite de l’image.
+Il s’enroule automatiquement tant qu’il y a de la place.
+.img-left {
+ float: left;
+ margin: 0 1em 1em 0;
+ max-width: 300px;
+}
+HTML
+Markdown
+CSS
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 65/67
+2️⃣ Utiliser la classe dans la note
+🥉 Astuce Obsidian (image + callout)
+Moins souple mais rapide :
+⚠️ Le rendu dépend du thème, pas toujours un vrai float.
+❌ Ce qui ne fonctionne pas
+Markdown pur ( ![]() avec align left) ❌
+![[image.jpg|left]] ❌ (Obsidian ne le supporte pas)
+🧭 Résumé
+Méthode Texte s’enroule Recommandée
+HTML float:left ✅ ⭐⭐⭐
+CSS snippet ✅ ⭐⭐⭐
+Callout ⚠️ ⭐
+Si tu veux, je peux aussi t’aider à :
+centrer verticalement le texte,
+faire un layout responsive,
+éviter les problèmes en export PDF,
+adapter ça à ton thème actuel.
+Dis-moi 👍
+<img src="le courage tranquille.jpg" class="img-left">
+> ![[le courage tranquille.jpg|250]]
+> Ton texte ici
+HTML
+Markdown
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 66/67
+05/03/2026 22:00 obsidian
+https://chatgpt.com/c/68e83a70-7f50-8325-bbe0-d747dae88d40 67/67
+
+
+

@@ -41,6 +41,7 @@ DJANGO_APPS = [
 PROJECT_APPS = [
     "filchat",
     "secretbox",
+    "core"
 ]
 
 THIRD_PARTY_APPS = [
@@ -111,11 +112,14 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "secretbox.context_processors.environment_context",
             ],
+            'builtins': [
+                'core.templatetags.navigation_tags',
+            ],
         },
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.secretbox"
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
