@@ -1,24 +1,13 @@
 {% load static wagtailcore_tags wagtailuserbar %}
-<nav class="navbar navbar-expand-lg shadow" style="background-color: white;">
-    <div class="container-fluid" style="background-color: white;">
-        <a class="navbar-brand" href="{% slugurl 'secretbox' %}">Accueil</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<nav class="navbar navbar-expand-lg shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        {% get_site_root as site_root %}
 
+        <a href="{% pageurl site_root %}">{{ site_root.title }}</a>
 
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% slugurl 'filchat' %}">FilChat</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% slugurl 'contact' %}">Contact</a>
-                </li>
-
-            </ul>
-
-        </div>
+        {% for menuitem in site_root.get_children.live.in_menu %}        
+            <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>{% if not forloop.last %} | {% endif %}        
+        {% endfor %}
     </div>
 </nav>
+

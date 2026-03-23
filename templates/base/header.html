@@ -1,30 +1,10 @@
 {% load wagtailcore_tags wagtailuserbar %}
 
-<header class="bg-white shadow-sm">
-    <a href="#main" class="skip-link">Skip to content</a>
-
-    {% get_site_root as site_root %}
-
-    <nav>
-        <p>
-            <a href="{% pageurl site_root %}">{{ site_root.title }}</a> |
-            {% for menuitem in site_root.get_children.live.in_menu %}
-    
-            {# Add the child pages of your HomePage that have their `Show in menu` checked #}
-            <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>{% if not forloop.last %} | {% endif %}
-    
-            {% endfor %}
-        </p>
-    </nav>
-
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-
-        <!-- Navigation -->
-        {% include 'navbar/navbarh.html' %}
-        {% include 'navbar/navbarg.html' %}
-        {% include 'navbar/navbard.html' %}
-
+<header class="bg-gray-800 text-white py-1 container-fluid text-center mt-auto p-5 rounded">
+    <div class="container mx-auto px-4">
+    {% include 'navbar/navbarh.html' %}
     </div>
+
     {% wagtailuserbar "top-right" %}
 </header>
 

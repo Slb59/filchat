@@ -593,6 +593,20 @@ wheels = [
 ]
 
 [[package]]
+name = "django-browser-reload"
+version = "1.21.0"
+source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "django", version = "5.2.10", source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }, marker = "python_full_version < '3.12'" },
+    { name = "django", version = "6.0.1", source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://pkgs.safetycli.com/package/osynia/pypi/packages/79/ef/ab407c1a2f14e13c75a6419a2d124954aa0364f62580ad95a3d31dc6c73d/django_browser_reload-1.21.0.tar.gz", hash = "sha256:3335ad3d107eb657f623d1a8e680dfbcab8a83ae1f94df1895e069dddf5604ba", size = 15800 }
+wheels = [
+    { url = "https://pkgs.safetycli.com/package/osynia/pypi/packages/46/61/1b4a8c589652859995bcab87682286443eb9fdf2d7fd584975b9ffc1db33/django_browser_reload-1.21.0-py3-none-any.whl", hash = "sha256:0b2a86ab460774fa9bb142a121c70e75a72f18109f51a4f6de409cd633d3a70d", size = 12852 },
+]
+
+[[package]]
 name = "django-compressor"
 version = "4.6.0"
 source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }
@@ -725,6 +739,11 @@ wheels = [
     { url = "https://pkgs.safetycli.com/package/osynia/pypi/packages/b8/f5/f91497da51098d7a25ee7409a49d24c880e3af3664da0872dbe238a7174b/django_tailwind-4.2.0-py3-none-any.whl", hash = "sha256:ff40ccb263faefac555fbaa340d6014f2b07fee6be2c8d5659f2cd63dbce02e9", size = 19225 },
 ]
 
+[package.optional-dependencies]
+reload = [
+    { name = "django-browser-reload", marker = "python_full_version < '3.11'" },
+]
+
 [[package]]
 name = "django-tailwind"
 version = "4.4.2"
@@ -741,6 +760,11 @@ dependencies = [
 sdist = { url = "https://pkgs.safetycli.com/package/osynia/pypi/packages/ca/21/86fda52a8d0f8d2f31d32982ee4d9cc4f29c868dbeb52412e430d083d126/django_tailwind-4.4.2.tar.gz", hash = "sha256:b3a3eb2d22cbb8c17565898fb68ccedcf806542b04fe4107bdfec7035d582819", size = 13965 }
 wheels = [
     { url = "https://pkgs.safetycli.com/package/osynia/pypi/packages/02/ed/85113d22ab4268600542152bc4b5512abb1204552b90e04848ebc496aa5c/django_tailwind-4.4.2-py3-none-any.whl", hash = "sha256:0e4a2836cb36e8952700457d049fadb8743583017cef80fa3a374f8597c289f4", size = 23358 },
+]
+
+[package.optional-dependencies]
+reload = [
+    { name = "django-browser-reload", marker = "python_full_version >= '3.11'" },
 ]
 
 [[package]]
@@ -826,8 +850,8 @@ dependencies = [
     { name = "django-compressor" },
     { name = "django-environ" },
     { name = "django-extensions" },
-    { name = "django-tailwind", version = "4.2.0", source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "django-tailwind", version = "4.4.2", source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "django-tailwind", version = "4.2.0", source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }, extra = ["reload"], marker = "python_full_version < '3.11'" },
+    { name = "django-tailwind", version = "4.4.2", source = { registry = "https://pkgs.safetycli.com/repository/osynia/pypi/simple/" }, extra = ["reload"], marker = "python_full_version >= '3.11'" },
     { name = "flake8-pyproject" },
     { name = "gitingest" },
     { name = "gunicorn" },
@@ -859,7 +883,7 @@ requires-dist = [
     { name = "django-compressor", specifier = ">=4.6.0" },
     { name = "django-environ", specifier = ">=0.12.0" },
     { name = "django-extensions", specifier = ">=4.1" },
-    { name = "django-tailwind", specifier = ">=4.2.0" },
+    { name = "django-tailwind", extras = ["reload"], specifier = ">=4.2.0" },
     { name = "flake8-pyproject", specifier = ">=1.2.4" },
     { name = "gitingest", specifier = ">=0.3.1" },
     { name = "gunicorn", specifier = ">=25.1.0" },

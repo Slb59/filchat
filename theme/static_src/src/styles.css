@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@layer utilities;
+@import "tailwindcss/utilities.css" layer(utilities);
 
 /**
   * A catch-all path to Django template files, JavaScript, and Python files
@@ -8,3 +10,54 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+/* bg-grey for dev and bg-brown for prod */
+@theme {
+  --color-black: #221f1f;
+  --color-gray: #9ca3af;
+  --color-grey: #7c9786;
+  --color-brown: #b36739;
+  --color-darkbrown: #4f1b11;
+  --color-bleup: #2A3D66;
+  --color-or: #FFD700;
+  --color-violet: #8A2BE2;
+  --color-vert: #2E8B57;
+  --color-taupe: #d7d4d0;
+  --color-white: #ecddd5;
+  --color-verybrown: #3a2412;
+}
+
+@layer utilities {
+
+  .bg-dev {
+    background-color: var(--color-gray);
+  }
+
+  .bg-prod {
+    background-color: var(--color-brown);
+  }
+
+  .bg-taupe {
+    background-color: var(--color-taupe);
+  }
+
+  .bg-darkbrown {
+    background-color: var(--color-darkbrown);
+  }
+
+  .bg-gray {
+    background-color: var(--color-gray);
+  }
+
+  .bg-bleup {
+    background-color: var(--color-bleup);
+  }
+
+  .text-black {
+    color: var(--color-black);
+  }
+
+  .text-white {
+    color: var(--color-white);
+  }
+}

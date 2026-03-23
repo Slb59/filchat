@@ -30,6 +30,7 @@ urlpatterns = [
 
     # path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
     # Wagtail pages (doit rester en dernier)
+    path("__reload__/", include("django_browser_reload.urls")),
     path("", include(wagtail_urls)),
     
 ]

@@ -65,6 +65,7 @@ THIRD_PARTY_APPS = [
     # Tailwind
     "tailwind",
     "theme",
+    "django_browser_reload",
 ]
 
 DEV_APPS = [
@@ -84,11 +85,12 @@ DJANGO_MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 TIERS_MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",    
 ]
 
 MIDDLEWARE = TIERS_MIDDLEWARE + DJANGO_MIDDLEWARE
@@ -110,7 +112,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "secretbox.context_processors.environment_context",
+                "core.context_processors.environment_context",
             ],
             'builtins': [
                 'core.templatetags.navigation_tags',
