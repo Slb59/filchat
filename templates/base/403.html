@@ -1,6 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Forbidden (403){% endblock %}
+{% load wagtailcore_tags static %}
+
+{% block bodyclass %}template-Custom403page{% endblock %}
+
 {% block page_content %}
-<h1>Forbidden (403)</h1>
-<p>{% if exception %}{{ exception }}{% else %}Vous n'êtes pas autotisé à accéder à cette page.{% endif %}</p>
+<div class="container">
+    <h1>403 - Section interdite</h1>
+    {% if page %}
+    <h2>{{ page.title }}</h2>
+    {% if page.subtitle %}
+    <h3>{{ page.subtitle }}</h3>
+    {% endif %}
+    {% if page.content %}
+    <div class="content">
+        {{ page.content|richtext }}
+    </div>
+    {% endif %}
+    {% else %}
+    <p>Vous n'êtes pas autotisé à accéder à cette page ! Veuillez quitter cette endroit immédiatement !</p>
+    {% endif %}
+    <a href="{% pageurl site.root_page %}">Retour à l'accueil</a>
+</div>
 {% endblock page_content %}

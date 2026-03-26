@@ -23,7 +23,11 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 WAGTAIL_SITE_NAME = env("WAGTAIL_SITE_NAME")
 WAGTAILADMIN_BASE_URL = "/"
-# NPM_BIN_PATH =env("NPM_BIN_PATH ")
+WAGTAILFRONTENDCACHE = {
+    'default': {
+        'BACKEND': 'wagtail.cache.backends.database.DatabaseCache',
+    }
+}
 
 # Application definition
 

@@ -1,7 +1,24 @@
 {% extends "base.html" %} 
 {% load wagtailcore_tags static %}
-{% block title %}Page non trouvée{% endblock %}  
+
+{% block bodyclass %}template-Custom404page{% endblock %}
+
 {% block page_content %}
-<h1>Page not found</h1>  
-<p>{% if exception %}{{ exception }}{% else %}Ce n'est pas la page que vous cherchiez.{% endif %}</p>
+<div class="container">
+        <h1>404 - Page non trouvée</h1>
+        {% if page %}
+            <h2>{{ page.title }}</h2>
+            {% if page.subtitle %}
+                <h3>{{ page.subtitle }}</h3>
+            {% endif %}
+            {% if page.content %}
+                <div class="content">
+                    {{ page.content|richtext }}
+                </div>
+            {% endif %}
+        {% else %}
+            <p>Désolé, la page que vous cherchez n'existe pas.</p>
+        {% endif %}
+        <a href="{% pageurl site.root_page %}">Retour à l'accueil</a>
+    </div>
 {% endblock page_content %}
