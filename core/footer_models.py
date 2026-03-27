@@ -1,30 +1,16 @@
 from django.db import models
-from wagtail.admin.panels import (
-    FieldPanel,
-    MultiFieldPanel,
-
-    # import PublishingPanel:
-    PublishingPanel,
-)
-
+from wagtail.admin.panels import FieldPanel  # import PublishingPanel:
+from wagtail.admin.panels import MultiFieldPanel, PublishingPanel
+from wagtail.contrib.settings.models import (BaseGenericSetting,
+                                             register_setting)
 # import RichTextField:
 from wagtail.fields import RichTextField
-
 # import DraftStateMixin, PreviewableMixin, RevisionMixin, TranslatableMixin:
-from wagtail.models import (
-    DraftStateMixin,
-    PreviewableMixin,
-    RevisionMixin,
-    TranslatableMixin,
-)
-
-from wagtail.contrib.settings.models import (
-    BaseGenericSetting,
-    register_setting,
-)
-
+from wagtail.models import (DraftStateMixin, PreviewableMixin, RevisionMixin,
+                            TranslatableMixin)
 # import register_snippet:
 from wagtail.snippets.models import register_snippet
+
 
 # ...keep the definition of the NavigationSettings model and add the FooterText model:
 @register_snippet

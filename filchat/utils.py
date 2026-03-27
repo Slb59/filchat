@@ -3,6 +3,7 @@ import os
 import zipfile
 from datetime import datetime
 
+
 def decoupe_chat(fichier_source, dossier_sortie):
     """Découpe un fichier de chat en plusieurs fichiers Markdown"""
     # Créer le dossier de sortie

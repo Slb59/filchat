@@ -1,5 +1,7 @@
 import os
-from pypdf import PdfWriter, PdfReader
+
+from pypdf import PdfReader, PdfWriter
+
 
 def merge(pwd, indirname):
     # pdfs = [

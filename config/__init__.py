@@ -1,5 +1,6 @@
-import pathlib
 import os
+import pathlib
+
 import environ  # type: ignore
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent

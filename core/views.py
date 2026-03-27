@@ -1,5 +1,7 @@
 from django.shortcuts import render
+
 from .models import Custom404Page, Custom500Page
+
 
 def custom_error_view(request, exception, error_code=404, page=None):
     """

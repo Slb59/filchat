@@ -7,20 +7,10 @@ import zipfile
 from datetime import datetime
 
 from PySide6.QtCore import QObject, Qt, QThread, Signal
-from PySide6.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QFileDialog,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QMainWindow,
-    QMessageBox,
-    QPushButton,
-    QTextEdit,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFileDialog,
+                               QHBoxLayout, QLabel, QLineEdit, QMainWindow,
+                               QMessageBox, QPushButton, QTextEdit,
+                               QVBoxLayout, QWidget)
 
 # Force l'utilisation de X11
 os.environ["QT_QPA_PLATFORM"] = "xcb"

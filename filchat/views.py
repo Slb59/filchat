@@ -3,12 +3,13 @@
 import os
 import zipfile
 from datetime import datetime
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, FileResponse
+
 from django.conf import settings
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import redirect, render
 
 from .models import FilChat
-from .utils import decoupe_chat, creer_archive_output
+from .utils import creer_archive_output, decoupe_chat
 
 
 def home(request):
