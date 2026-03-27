@@ -21,5 +21,6 @@ run-front:
 	clear
 	uv run manage.py tailwind start # remplacer par npm par la suite
 
-build:
+to-build:
 	clear
+	./build.sh

@@ -70,7 +70,10 @@ fi
 echo "▶ Copie du projet"
 # rsync -av --delete --exclude-from='.installignore' ./ "$APP_DIR/"
 BASE_NAME="${DATA_DIR}/db.sqlite3"
-cp "${BASE_NAME}" "${BASE_NAME}.${VERSION}.back"
+if [ -f "${BASE_NAME}" ]; then
+  cp "${BASE_NAME}" "${BASE_NAME}.${VERSION}.back"
+  echo "▶ Fichier de base de données trouvé, une sauvegarde est créée dans ${BASE_NAME}.${VERSION}.back"
+fi
 VERSION="$(tr -d '[:space:]' < VERSION)"
 ARCHIVE_NAME="${APP_NAME}-${VERSION}.7z"
 echo "▶ Extraction de l'archive"

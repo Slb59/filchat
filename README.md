@@ -56,7 +56,7 @@ uv run gitingest . -o tests/output/digest.txt -i "*.py *.css *.js"
 
 ## creation du fichier zip
 ./build.sh
-utilise le fichier 7z de /build pour télécharger dans le dossier d'installation et lance le script install.sh
+utilise le fichier 7z de /build pour télécharger dans le dossier d'installation et lance le script install.sh en sudo
 Le répertoire d'installation pourrait être secretbox dans journalling par exemple
 
 ## creation de l'executable
